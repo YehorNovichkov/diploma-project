@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -20,42 +14,53 @@ model User {
   surname    String
   patronymic String
   password   String?
-  Student    Student?
-  Teacher    Teacher?
-  Parent     Parent?
-  Admin      Admin?
+  student    Student?
+  teacher    Teacher?
+  parent     Parent?
+  admin      Admin?
 }
 
 model Student {
-  id                 String               @id @default(uuid())
-  user               User                 @relation(fields: [userId], references: [id])
-  userId             String               @unique
-  Class              Class?               @relation(fields: [classId], references: [id])
-  classId            Int?
-  parent             Parent               @relation(fields: [parentId], references: [id])
-  parentId           String
-  StudentsTaskAnswer StudentsTaskAnswer[]
+  id                  String               @id @default(uuid())
+  user                User                 @relation(fields: [userId], references: [id])
+  userId              String               @unique
+  class               Class?               @relation(fields: [classId], references: [id])
+  classId             Int?
+  parent              Parent               @relation(fields: [parentId], references: [id])
+  parentId            String
+  studentsTaskAnswers StudentsTaskAnswer[]
+  TaskAnswer          TaskAnswer[]
+
+  @@index([userId])
+  @@index([classId])
+  @@index([parentId])
 }
 
 model Teacher {
   id       String    @id @default(uuid())
   user     User      @relation(fields: [userId], references: [id])
   userId   String    @unique
-  Class    Class[]
+  classes  Class[]
   subjects Subject[]
+
+  @@index([userId])
 }
 
 model Parent {
-  id      String    @id @default(uuid())
-  user    User      @relation(fields: [userId], references: [id])
-  userId  String    @unique
-  Student Student[]
+  id       String    @id @default(uuid())
+  user     User      @relation(fields: [userId], references: [id])
+  userId   String    @unique
+  students Student[]
+
+  @@index([userId])
 }
 
 model Admin {
   id     String @id @default(uuid())
   user   User   @relation(fields: [userId], references: [id])
   userId String @unique
+
+  @@index([userId])
 }
 
 model Class {
@@ -64,38 +69,57 @@ model Class {
   students Student[]
   teacher  Teacher   @relation(fields: [userId], references: [id])
   userId   String
-  subject  Subject[]
-  Task     Task[]
-  Test     Test[]
+  subjects Subject[]
+  tasks    Task[]
+  tests    Test[]
+
+  @@index([userId])
 }
 
 model Subject {
   id       Int       @id @default(autoincrement())
   name     String
-  class    Class[]
+  classes  Class[]
   teachers Teacher[]
-  Task     Task[]
-  Test     Test[]
+  tasks    Task[]
+  tests    Test[]
 }
 
 model Task {
-  id                 Int                  @id @default(autoincrement())
-  created_at         DateTime             @default(now())
-  name               String
-  description        String
-  deadline           DateTime
-  files              String[]
-  answerTypes        AnswerType[]
-  subject            Subject              @relation(fields: [subjectId], references: [id])
-  subjectId          Int
-  class              Class                @relation(fields: [classId], references: [id])
-  classId            Int
-  StudentsTaskAnswer StudentsTaskAnswer[]
+  id                  Int                  @id @default(autoincrement())
+  created_at          DateTime             @default(now())
+  name                String
+  description         String
+  deadline            DateTime
+  files               String[]
+  answerTypes         AnswerType[]
+  subject             Subject              @relation(fields: [subjectId], references: [id])
+  subjectId           Int
+  class               Class                @relation(fields: [classId], references: [id])
+  classId             Int
+  studentsTaskAnswers StudentsTaskAnswer[]
+  taskAnswers         TaskAnswer[]
+
+  @@index([subjectId])
+  @@index([classId])
 }
 
 enum AnswerType {
   TEXT
   FILE
+}
+
+model TaskAnswer {
+  id        Int     @id @default(autoincrement())
+  text      String?
+  file      String?
+  task      Task    @relation(fields: [taskId], references: [id])
+  taskId    Int
+  student   Student @relation(fields: [studentId], references: [id])
+  studentId String
+
+  @@index([taskId])
+  @@index([studentId])
 }
 
 model StudentsTaskAnswer {
@@ -106,6 +130,9 @@ model StudentsTaskAnswer {
   studentId String
   task      Task    @relation(fields: [taskId], references: [id])
   taskId    Int
+
+  @@index([studentId])
+  @@index([taskId])
 }
 
 model Test {
@@ -119,23 +146,30 @@ model Test {
   class       Class      @relation(fields: [classId], references: [id])
   classId     Int
   questions   Question[]
+
+  @@index([subjectId])
+  @@index([classId])
 }
 
 model Question {
-  id           Int      @id @default(autoincrement())
+  id           Int          @id @default(autoincrement())
   text         String
   file         String?
-  answers      Answer[]
+  testAnswers  TestAnswer[]
   manualAnswer String?
-  test         Test     @relation(fields: [testId], references: [id])
+  test         Test         @relation(fields: [testId], references: [id])
   testId       Int
+
+  @@index([testId])
 }
 
-model Answer {
+model TestAnswer {
   id         Int      @id @default(autoincrement())
   text       String
   file       String?
   isCorrect  Boolean
   question   Question @relation(fields: [questionId], references: [id])
   questionId Int
+
+  @@index([questionId])
 }
