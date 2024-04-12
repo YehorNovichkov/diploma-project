@@ -26,8 +26,8 @@ model Student {
   userId              String               @unique
   class               Class?               @relation(fields: [classId], references: [id])
   classId             Int?
-  parent              Parent               @relation(fields: [parentId], references: [id])
-  parentId            String
+  parent              Parent?              @relation(fields: [parentId], references: [id])
+  parentId            String?
   studentsTaskAnswers StudentsTaskAnswer[]
   TaskAnswer          TaskAnswer[]
 
@@ -136,22 +136,22 @@ model StudentsTaskAnswer {
 }
 
 model Test {
-  id          Int        @id @default(autoincrement())
-  created_at  DateTime   @default(now())
+  id          Int            @id @default(autoincrement())
+  created_at  DateTime       @default(now())
   name        String
   description String
   deadline    DateTime
-  subject     Subject    @relation(fields: [subjectId], references: [id])
+  subject     Subject        @relation(fields: [subjectId], references: [id])
   subjectId   Int
-  class       Class      @relation(fields: [classId], references: [id])
+  class       Class          @relation(fields: [classId], references: [id])
   classId     Int
-  questions   Question[]
+  questions   TestQuestion[]
 
   @@index([subjectId])
   @@index([classId])
 }
 
-model Question {
+model TestQuestion {
   id           Int          @id @default(autoincrement())
   text         String
   file         String?
@@ -164,11 +164,11 @@ model Question {
 }
 
 model TestAnswer {
-  id         Int      @id @default(autoincrement())
+  id         Int          @id @default(autoincrement())
   text       String
   file       String?
   isCorrect  Boolean
-  question   Question @relation(fields: [questionId], references: [id])
+  question   TestQuestion @relation(fields: [questionId], references: [id])
   questionId Int
 
   @@index([questionId])

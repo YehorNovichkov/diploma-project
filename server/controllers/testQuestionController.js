@@ -1,7 +1,7 @@
 import db from '../db.js'
 
-class QuestionController {
-    async createQuestion(req, res) {
+class TestQuestionController {
+    async createTestQuestion(req, res) {
         try {
             const { text, file, answers, manualAnswer, testId } = req.body
             const question = await db.question.create({
@@ -19,18 +19,18 @@ class QuestionController {
         }
     }
 
-    async getQuestions(req, res) {
+    async getTestQuestions(req, res) {
         const questions = await db.question.findMany()
         res.json(questions)
     }
 
-    async getOneQuestion(req, res) {
+    async getOneTestQuestion(req, res) {
         const { id } = req.params
         const question = await db.question.findUnique({ where: { id } })
         res.json(question)
     }
 
-    async updateQuestion(req, res) {
+    async updateTestQuestion(req, res) {
         const { id } = req.params
         const { text, file, answers, manualAnswer, testId } = req.body
         const question = await db.question.update({
@@ -46,11 +46,11 @@ class QuestionController {
         res.json(question)
     }
 
-    async deleteQuestion(req, res) {
+    async deleteTestQuestion(req, res) {
         const { id } = req.params
         const question = await db.question.delete({ where: { id } })
         res.json(question)
     }
 }
 
-export default new QuestionController()
+export default new TestQuestionController()
