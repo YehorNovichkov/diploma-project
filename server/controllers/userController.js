@@ -1,43 +1,65 @@
 import db from '../db.js'
+const ApiError = require('../error/apiError')
+const validate = require('../utils/serverEmailAndPasswordValidation')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
-/* class UserController {
-    async createUser(req, res) {
-        try {
-            const { name, email, password } = req.body
-            const user = await db.user.create({
-                data: { name, email, password },
-            })
-            res.json(user)
-        } catch (e) {
-            res.status(500).json(e)
+const generateToken = (id, email) => {
+    return jwt.sign({ id, email }, process.env.SECRET_KEY, {
+        expiresIn: '24h',
+    })
+}
+
+class UserController {
+    async registration(req, res, next) {
+        const { email, password, role } = req.body
+
+        if (!validate(email, password)) {
+            return next(ApiError.badRequest('invalid email or password'))
         }
-    }
 
-    async getUsers(req, res) {
-        const users = await db.user.findMany()
-        res.json(users)
-    }
+        const candidate = await db.user.findUnique({ where: { email } })
+        if (candidate) {
+            return next(
+                ApiError.badRequest('user with this email already exists')
+            )
+        }
 
-    async getOneUser(req, res) {
-        const { id } = req.params
-        const user = await db.user.findUnique({ where: { id } })
-        res.json(user)
-    }
-
-    async updateUser(req, res) {
-        const { id } = req.params
-        const { name, email } = req.body
-        const user = await db.user.update({
-            where: { id },
-            data: { name, email },
+        const hashPassword = await bcrypt.hash(password, 5)
+        const user = await db.user.create({
+            data: { email, password: hashPassword },
         })
-        res.json(user)
+        const token = generateToken(user.id, user.email)
+        return res.json({ token })
     }
 
-    async deleteUser(req, res) {
-        const { id } = req.params
-        const user = await db.user.delete({ where: { id } })
-        res.json(user)
+    async login(req, res, next) {
+        const { email, password } = req.body
+
+        if (!validate(email, password)) {
+            return next(ApiError.badRequest('invalid email or password'))
+        }
+
+        const user = await db.user.findUnique({ where: { email } })
+        if (!user) {
+            return next(
+                ApiError.badRequest('user with specified email is not found')
+            )
+        }
+
+        let comparePassword = bcrypt.compareSync(password, user.password)
+        if (!comparePassword) {
+            return next(ApiError.badRequest('wrong password'))
+        }
+
+        const token = generateToken(user.id, user.email)
+        return res.json({ token })
+    }
+
+    async check(req, res, next) {
+        const token = generateToken(req.user.id, req.user.email)
+        res.json({ token })
     }
 }
-*/
+
+module.exports = new UserController()

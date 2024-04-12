@@ -21,15 +21,14 @@ model User {
 }
 
 model Student {
-  id                  String               @id @default(uuid())
-  user                User                 @relation(fields: [userId], references: [id])
-  userId              String               @unique
-  class               Class?               @relation(fields: [classId], references: [id])
-  classId             Int?
-  parent              Parent?              @relation(fields: [parentId], references: [id])
-  parentId            String?
-  studentsTaskAnswers StudentsTaskAnswer[]
-  TaskAnswer          TaskAnswer[]
+  id         String       @id @default(uuid())
+  user       User         @relation(fields: [userId], references: [id])
+  userId     String       @unique
+  class      Class?       @relation(fields: [classId], references: [id])
+  classId    Int?
+  parent     Parent?      @relation(fields: [parentId], references: [id])
+  parentId   String?
+  TaskAnswer TaskAnswer[]
 
   @@index([userId])
   @@index([classId])
@@ -86,19 +85,18 @@ model Subject {
 }
 
 model Task {
-  id                  Int                  @id @default(autoincrement())
-  created_at          DateTime             @default(now())
-  name                String
-  description         String
-  deadline            DateTime
-  files               String[]
-  answerTypes         AnswerType[]
-  subject             Subject              @relation(fields: [subjectId], references: [id])
-  subjectId           Int
-  class               Class                @relation(fields: [classId], references: [id])
-  classId             Int
-  studentsTaskAnswers StudentsTaskAnswer[]
-  taskAnswers         TaskAnswer[]
+  id          Int          @id @default(autoincrement())
+  created_at  DateTime     @default(now())
+  name        String
+  description String
+  deadline    DateTime
+  files       String[]
+  answerTypes AnswerType[]
+  subject     Subject      @relation(fields: [subjectId], references: [id])
+  subjectId   Int
+  class       Class        @relation(fields: [classId], references: [id])
+  classId     Int
+  taskAnswers TaskAnswer[]
 
   @@index([subjectId])
   @@index([classId])
@@ -120,19 +118,6 @@ model TaskAnswer {
 
   @@index([taskId])
   @@index([studentId])
-}
-
-model StudentsTaskAnswer {
-  id        Int     @id @default(autoincrement())
-  text      String?
-  file      String?
-  student   Student @relation(fields: [studentId], references: [id])
-  studentId String
-  task      Task    @relation(fields: [taskId], references: [id])
-  taskId    Int
-
-  @@index([studentId])
-  @@index([taskId])
 }
 
 model Test {
