@@ -1,4 +1,4 @@
-import db from '../db.js'
+const db = require('../db')
 
 class TestQuestionController {
     async createTestQuestion(req, res) {
@@ -53,4 +53,4 @@ class TestQuestionController {
     }
 }
 
-export default new TestQuestionController()
+module.exports = new TestQuestionController()

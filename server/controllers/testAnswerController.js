@@ -1,7 +1,7 @@
-import db from '../db.js'
+const db = require('../db')
 
 class TestAnswerController {
-    async createAnswer(req, res) {
+    async createTestAnswer(req, res) {
         try {
             const { text, file, isCorrect, questionId } = req.body
             const answer = await db.answer.create({
@@ -18,18 +18,18 @@ class TestAnswerController {
         }
     }
 
-    async getAnswers(req, res) {
+    async getTestAnswers(req, res) {
         const answers = await db.answer.findMany()
         res.json(answers)
     }
 
-    async getOneAnswer(req, res) {
+    async getOneTestAnswer(req, res) {
         const { id } = req.params
         const answer = await db.answer.findUnique({ where: { id } })
         res.json(answer)
     }
 
-    async updateAnswer(req, res) {
+    async updateTestAnswer(req, res) {
         const { id } = req.params
         const { text, file, isCorrect, questionId } = req.body
         const answer = await db.answer.update({
@@ -44,11 +44,11 @@ class TestAnswerController {
         res.json(answer)
     }
 
-    async deleteAnswer(req, res) {
+    async deleteTestAnswer(req, res) {
         const { id } = req.params
         const answer = await db.answer.delete({ where: { id } })
         res.json(answer)
     }
 }
 
-export default new TestAnswerController()
+module.exports = new TestAnswerController()

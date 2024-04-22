@@ -8,16 +8,16 @@ datasource db {
 }
 
 model User {
-  id         String   @id @default(uuid())
-  email      String?  @unique
-  name       String
-  surname    String
-  patronymic String
-  password   String?
-  student    Student?
-  teacher    Teacher?
-  parent     Parent?
-  admin      Admin?
+  id           String   @id @default(uuid())
+  email        String?  @unique
+  name         String
+  surname      String
+  patronymic   String
+  passwordHash String?
+  student      Student?
+  teacher      Teacher?
+  parent       Parent?
+  admin        Admin?
 }
 
 model Student {

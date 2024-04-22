@@ -1,6 +1,6 @@
-import db from '../db.js'
-const ApiError = require('../error/apiError')
-const validate = require('../utils/serverEmailAndPasswordValidation')
+const db = require('../db')
+const ApiError = require('../error/apiError.js')
+const validate = require('../utils/serverEmailAndPasswordValidation.js')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
@@ -12,7 +12,7 @@ const generateToken = (id, email) => {
 
 class UserController {
     async registration(req, res, next) {
-        const { email, password, role } = req.body
+        const { email, password, name, surname, patronymic } = req.body
 
         if (!validate(email, password)) {
             return next(ApiError.badRequest('invalid email or password'))
@@ -27,7 +27,13 @@ class UserController {
 
         const hashPassword = await bcrypt.hash(password, 5)
         const user = await db.user.create({
-            data: { email, password: hashPassword },
+            data: {
+                email,
+                passwordHash: hashPassword,
+                name,
+                surname,
+                patronymic,
+            },
         })
         const token = generateToken(user.id, user.email)
         return res.json({ token })
@@ -47,7 +53,7 @@ class UserController {
             )
         }
 
-        let comparePassword = bcrypt.compareSync(password, user.password)
+        let comparePassword = bcrypt.compareSync(password, user.passwordHash)
         if (!comparePassword) {
             return next(ApiError.badRequest('wrong password'))
         }

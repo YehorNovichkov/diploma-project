@@ -1,7 +1,7 @@
-import db from '../db.js'
+const db = require('../db')
 
 class TaskAnswerController {
-    async createAnswer(req, res) {
+    async createTaskAnswer(req, res) {
         try {
             const { text, file, taskId, studentId } = req.body
             const answer = await db.taskAnswer.create({
@@ -18,18 +18,18 @@ class TaskAnswerController {
         }
     }
 
-    async getAnswers(req, res) {
+    async getTaskAnswers(req, res) {
         const answers = await db.taskAnswer.findMany()
         res.json(answers)
     }
 
-    async getOneAnswer(req, res) {
+    async getOneTaskAnswer(req, res) {
         const { id } = req.params
         const answer = await db.taskAnswer.findUnique({ where: { id } })
         res.json(answer)
     }
 
-    async updateAnswer(req, res) {
+    async updateTaskAnswer(req, res) {
         const { id } = req.params
         const { text, file, taskId, studentId } = req.body
         const answer = await db.taskAnswer.update({
@@ -44,11 +44,11 @@ class TaskAnswerController {
         res.json(answer)
     }
 
-    async deleteAnswer(req, res) {
+    async deleteTaskAnswer(req, res) {
         const { id } = req.params
         const answer = await db.taskAnswer.delete({ where: { id } })
         res.json(answer)
     }
 }
 
-export default new TaskAnswerController()
+module.exports = new TaskAnswerController()

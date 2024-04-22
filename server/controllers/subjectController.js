@@ -1,4 +1,4 @@
-import db from '../db.js'
+const db = require('../db')
 
 class SubjectController {
     async createSubject(req, res) {
@@ -41,4 +41,4 @@ class SubjectController {
     }
 }
 
-export default new SubjectController()
+module.exports = new SubjectController()

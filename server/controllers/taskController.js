@@ -1,4 +1,4 @@
-import db from '../db'
+const db = require('../db')
 
 class TaskController {
     async createTask(req, res) {
@@ -73,4 +73,4 @@ class TaskController {
     }
 }
 
-export default new TaskController()
+module.exports = new TaskController()

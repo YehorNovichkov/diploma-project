@@ -1,4 +1,4 @@
-import db from '../db.js'
+const db = require('../db')
 
 class ClassController {
     async createClass(req, res) {
@@ -50,4 +50,4 @@ class ClassController {
     }
 }
 
-export default new ClassController()
+module.exports = new ClassController()

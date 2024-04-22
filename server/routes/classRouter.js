@@ -1,15 +1,16 @@
-const router = require('express').Router()
+const Router = require('express')
+const router = new Router()
 const classController = require('../controllers/classController')
-const roleCheckMiddleware = require('../middleware/roleCheckMiddleware')
+const checkRole = require('../middleware/roleCheckMiddleware')
 
-router.post('/', roleCheckMiddleware(['admin']), classController.create)
+router.post('/', checkRole(['admin']), classController.createClass)
 
-router.get('/', classController.getAll)
+router.get('/', classController.getClasses)
 
-router.get('/:id', classController.getOne)
+router.get('/:id', classController.getOneClass)
 
-router.put('/:id', roleCheckMiddleware(['admin']), classController.update)
+router.put('/:id', checkRole(['admin']), classController.updateClass)
 
-router.delete('/:id', roleCheckMiddleware(['admin']), classController.delete)
+router.delete('/:id', checkRole(['admin']), classController.deleteClass)
 
 module.exports = router

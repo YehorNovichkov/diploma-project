@@ -1,27 +1,28 @@
-const router = require('express').Router()
-const taskController = require('../controllers/taskController')
+const Router = require('express')
+const router = new Router()
+const taskController = require('../controllers/testController')
 const roleCheckMiddleware = require('../middleware/roleCheckMiddleware')
 
 router.post(
     '/',
     roleCheckMiddleware(['teacher', 'admin']),
-    taskController.create
+    taskController.createTest
 )
 
-router.get('/', taskController.getAll)
+router.get('/', taskController.getTests)
 
-router.get('/:id', taskController.getOne)
+router.get('/:id', taskController.getOneTest)
 
 router.put(
     '/:id',
     roleCheckMiddleware(['teacher', 'admin']),
-    taskController.update
+    taskController.updateTest
 )
 
 router.delete(
     '/:id',
     roleCheckMiddleware(['teacher', 'admin']),
-    taskController.delete
+    taskController.deleteTest
 )
 
 module.exports = router
