@@ -13,10 +13,12 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ModeToggle } from '@/components/ui/mode-toggle'
 import { useAppContext } from '@/components/context/appWrapper'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { login } from '@/api/userAPI'
 
 export default function Login() {
+    const router = useRouter()
     const { user } = useAppContext()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -26,6 +28,7 @@ export default function Login() {
             let data = await login(email, password)
             user.setUser(data)
             user.setIsAuth(true)
+            router.push('/teacher')
             console.log(data)
         } catch (error) {
             console.error(error)

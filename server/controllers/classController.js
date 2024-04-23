@@ -3,10 +3,10 @@ const db = require('../db')
 class ClassController {
     async createClass(req, res) {
         try {
-            const { name, teacher, students } = req.body
+            const { name, userId } = req.body
 
             const newClass = await db.class.create({
-                data: { name, teacher, students },
+                data: { name, userId },
             })
 
             res.json(newClass)

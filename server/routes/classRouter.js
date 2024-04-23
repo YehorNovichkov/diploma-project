@@ -3,7 +3,7 @@ const router = new Router()
 const classController = require('../controllers/classController')
 const checkRole = require('../middleware/roleCheckMiddleware')
 
-router.post('/', checkRole(['admin']), classController.createClass)
+router.post('/', classController.createClass)
 
 router.get('/', classController.getClasses)
 

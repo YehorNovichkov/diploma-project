@@ -66,6 +66,21 @@ class UserController {
         const token = generateToken(req.user.id, req.user.email)
         res.json({ token })
     }
+
+    async getUser(req, res, next) {
+        const { id } = req.params
+        const user = await db.user.findUnique({
+            where: { id: id },
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                surname: true,
+                patronymic: true,
+            },
+        })
+        res.json(user)
+    }
 }
 
 module.exports = new UserController()
