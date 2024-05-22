@@ -12,8 +12,14 @@ export const registration = async (email, password) => {
 
 export const login = async (email, password) => {
     const { data } = await $host.post('api/user/login', { email, password })
-    localStorage.setItem('token', data.token)
+    // localStorage.setItem('token', data.token)
+    // createEncryptedCookie('token', data.token)
     return jwtDecode(data.token)
+}
+
+export const getToken = async (email, password) => {
+    const { data } = await $host.post('api/user/login', { email, password })
+    return data
 }
 
 export const check = async () => {
@@ -24,6 +30,12 @@ export const check = async () => {
 
 export const fetchUser = async (id) => {
     const { data } = await $host.get(`api/user/${id}`)
-    console.log(data)
     return data
 }
+
+/* export const restoreSession = async () => {
+    const token = getDecryptedCookie('token')
+    localStorage.setItem('token', token)
+    user.setUser(data)
+    user.setIsAuth(true)
+} */

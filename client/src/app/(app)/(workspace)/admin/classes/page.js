@@ -43,6 +43,9 @@ export default function Classes() {
                 </div>
             ) : (
                 <div className='flex min-h-screen flex-col items-center p-24'>
+                    <h1 className='scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl'>
+                        Класи
+                    </h1>
                     <div className='mb-4'>
                         <Label htmlFor='class'>Назва класу</Label>
                         <Input

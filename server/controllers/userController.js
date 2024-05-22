@@ -15,14 +15,12 @@ class UserController {
         const { email, password, name, surname, patronymic } = req.body
 
         if (!validate(email, password)) {
-            return next(ApiError.badRequest('invalid email or password'))
+            return next(ApiError.badRequest('INVALID_DATA'))
         }
 
         const candidate = await db.user.findUnique({ where: { email } })
         if (candidate) {
-            return next(
-                ApiError.badRequest('user with this email already exists')
-            )
+            return next(ApiError.badRequest('EMAIL_EXISTS'))
         }
 
         const hashPassword = await bcrypt.hash(password, 5)
@@ -35,7 +33,7 @@ class UserController {
                 patronymic,
             },
         })
-        const token = generateToken(user.id, user.email)
+        const token = generateToken(user.id)
         return res.json({ token })
     }
 
@@ -43,27 +41,25 @@ class UserController {
         const { email, password } = req.body
 
         if (!validate(email, password)) {
-            return next(ApiError.badRequest('invalid email or password'))
+            return next(ApiError.badRequest('INVALID_DATA'))
         }
 
         const user = await db.user.findUnique({ where: { email } })
         if (!user) {
-            return next(
-                ApiError.badRequest('user with specified email is not found')
-            )
+            return next(ApiError.badRequest('EMAIL_NOT_FOUND'))
         }
 
         let comparePassword = bcrypt.compareSync(password, user.passwordHash)
         if (!comparePassword) {
-            return next(ApiError.badRequest('wrong password'))
+            return next(ApiError.badRequest('WRONG_PASSWORD'))
         }
 
-        const token = generateToken(user.id, user.email)
+        const token = generateToken(user.id)
         return res.json({ token })
     }
 
     async check(req, res, next) {
-        const token = generateToken(req.user.id, req.user.email)
+        const token = generateToken(req.user.id)
         res.json({ token })
     }
 

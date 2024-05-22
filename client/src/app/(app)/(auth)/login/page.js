@@ -15,24 +15,31 @@ import { ModeToggle } from '@/components/ui/mode-toggle'
 import { useAppContext } from '@/components/context/appWrapper'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { login } from '@/api/userAPI'
+import { signIn, useSession } from 'next-auth/react'
+import { getCurrentUserAccessToken } from '@/lib/session'
+import { jwtDecode } from 'jwt-decode'
+import { fetchUser } from '@/api/userAPI'
 
 export default function Login() {
     const router = useRouter()
-    const { user } = useAppContext()
+    const { userStore } = useAppContext()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
     const handleLogin = async () => {
-        try {
-            let data = await login(email, password)
-            user.setUser(data)
-            user.setIsAuth(true)
-            router.push('/teacher')
-            console.log(data)
-        } catch (error) {
-            console.error(error)
-        }
+        const res = await signIn('credentials', {
+            redirect: false,
+            email: email,
+            password: password,
+        })
+
+        const token = await getCurrentUserAccessToken()
+        const data = jwtDecode(token)
+        userStore.setUserId(data.id)
+        const userData = await fetchUser(userStore.userId)
+        userStore.setUser(userData)
+        userStore.setIsAuth(true)
+        router.push('/teacher')
     }
 
     return (
@@ -51,7 +58,7 @@ export default function Login() {
                             onChange={(e) => setEmail(e.target.value)}
                             id='email'
                             type='email'
-                            placeholder='m@example.com'
+                            placeholder='email@example.com'
                             required
                         />
                     </div>
