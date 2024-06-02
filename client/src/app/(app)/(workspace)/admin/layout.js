@@ -1,23 +1,11 @@
 'use client'
 
+import { useAppContext } from '@/components/context/appWrapper'
 import { Button } from '@/components/ui/button'
 import { ModeToggle } from '@/components/ui/mode-toggle'
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-    TooltipProvider,
-} from '@/components/ui/tooltip'
-import {
-    SquareUser,
-    Triangle,
-    School,
-    BookText,
-    BookCheck,
-    LogIn,
-} from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { GraduationCap, LibraryBig, SquareUser, Triangle, Users } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useAppContext } from '@/components/context/appWrapper'
 
 export default function AdminLayout({ children }) {
     const router = useRouter()
@@ -49,7 +37,7 @@ export default function AdminLayout({ children }) {
                                     size='icon'
                                     className='rounded-lg'
                                     aria-label='Класи'>
-                                    <School className='size-5' />
+                                    <GraduationCap className='size-5' />
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent side='right' sideOffset={5}>
@@ -65,8 +53,8 @@ export default function AdminLayout({ children }) {
                                     variant='ghost'
                                     size='icon'
                                     className='rounded-lg'
-                                    aria-label='Завдання'>
-                                    <BookText className='size-5' />
+                                    aria-label='Предмети'>
+                                    <LibraryBig className='size-5' />
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent side='right' sideOffset={5}>
@@ -82,8 +70,8 @@ export default function AdminLayout({ children }) {
                                     variant='ghost'
                                     size='icon'
                                     className='rounded-lg'
-                                    aria-label='Тести'>
-                                    <BookCheck className='size-5' />
+                                    aria-label='Користувачі'>
+                                    <Users className='size-5' />
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent side='right' sideOffset={5}>
@@ -98,7 +86,7 @@ export default function AdminLayout({ children }) {
                             <TooltipTrigger asChild>
                                 <Button
                                     onClick={() => {
-                                        router.push('/teacher/profile')
+                                        router.push('/profile')
                                     }}
                                     variant='ghost'
                                     size='icon'

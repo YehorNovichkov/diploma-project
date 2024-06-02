@@ -1,14 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ModeToggle } from '@/components/ui/mode-toggle'
@@ -34,8 +27,10 @@ export default function Login() {
         })
 
         const token = await getCurrentUserAccessToken()
+        console.log(token)
         const data = jwtDecode(token)
         userStore.setUserId(data.id)
+        userStore.setUserRoles(data.roles)
         const userData = await fetchUser(userStore.userId)
         userStore.setUser(userData)
         userStore.setIsAuth(true)
@@ -47,29 +42,16 @@ export default function Login() {
             <Card className='w-full max-w-sm'>
                 <CardHeader>
                     <CardTitle className='text-2xl'>Вхід</CardTitle>
-                    <CardDescription>
-                        Введіть ваш email нижче, для входу.
-                    </CardDescription>
+                    <CardDescription>Введіть ваш email нижче, для входу.</CardDescription>
                 </CardHeader>
                 <CardContent className='grid gap-4'>
                     <div className='grid gap-2'>
                         <Label htmlFor='email'>Email</Label>
-                        <Input
-                            onChange={(e) => setEmail(e.target.value)}
-                            id='email'
-                            type='email'
-                            placeholder='email@example.com'
-                            required
-                        />
+                        <Input onChange={(e) => setEmail(e.target.value)} id='email' type='email' placeholder='email@example.com' required />
                     </div>
                     <div className='grid gap-2'>
                         <Label htmlFor='password'>Пароль</Label>
-                        <Input
-                            onChange={(e) => setPassword(e.target.value)}
-                            id='password'
-                            type='password'
-                            required
-                        />
+                        <Input onChange={(e) => setPassword(e.target.value)} id='password' type='password' required />
                     </div>
                 </CardContent>
                 <CardFooter>

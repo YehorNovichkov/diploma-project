@@ -3,10 +3,10 @@ const db = require('../db')
 class ClassController {
     async createClass(req, res) {
         try {
-            const { name, userId } = req.body
+            const { name } = req.body
 
             const newClass = await db.class.create({
-                data: { name, userId },
+                data: { name },
             })
 
             res.json(newClass)
@@ -24,18 +24,35 @@ class ClassController {
     async getOneClass(req, res) {
         const { id } = req.params
 
-        const classObj = await db.class.findUnique({ where: { id } })
+        const idInt = parseInt(id)
+        const classObj = await db.class.findUnique({ where: { id: idInt } })
 
         res.json(classObj)
     }
 
+    /**
+     * strips all non-alphanumeric characters from the query and searches for classes that contain the query
+     * @param {*} req
+     * @param {*} res
+     */
+    async getClassesByName(req, res) {
+        const { query } = req.body
+        const sanitizedQuery = query.replace(/[^a-zA-Zа-яА-Я0-9]/g, '').toLowerCase()
+        const classes = await db.$queryRaw`
+            SELECT * FROM "Class"
+            WHERE REPLACE(LOWER("name"), '-', '') LIKE ${'%' + sanitizedQuery + '%'}
+        `
+
+        res.json(classes)
+    }
+
     async updateClass(req, res) {
-        const { id } = req.params
-        const { name, teacher, students } = req.body
+        const { id } = parseInt(req.params)
+        const { name } = req.body
 
         const updatedClass = await db.class.update({
             where: { id },
-            data: { name, teacher, students },
+            data: { name },
         })
 
         res.json(updatedClass)

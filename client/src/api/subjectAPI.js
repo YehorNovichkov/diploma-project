@@ -1,19 +1,19 @@
-import { $authHost, $host } from './_index'
+import { $authHost } from './_index'
 
 export const createSubject = async (name) => {
-    const { data } = await $host.post('api/subject', {
+    const { data } = await $authHost.post('api/subject', {
         name,
     })
     return data
 }
 
 export const fetchSubjects = async () => {
-    const { data } = await $host.get('api/subject')
+    const { data } = await $authHost.get('api/subject')
     return data
 }
 
 export const fetchSubject = async (id) => {
-    const { data } = await $host.get(`api/subject/${id}`)
+    const { data } = await $authHost.get(`api/subject/${id}`)
     return data
 }
 

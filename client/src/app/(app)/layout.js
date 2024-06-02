@@ -40,13 +40,18 @@ export default function AppLayout({ children }) {
                     return
                 })
             } else {
+                router.push('/login')
                 setDataLoaded(true)
             }
         })
     }, [router])
 
     if (!dataLoaded) {
-        return <Loader2Icon className='animate-spin' />
+        return (
+            <div className='flex min-h-screen items-center justify-center'>
+                <Loader2Icon className='w-10 h-10 animate-spin' />
+            </div>
+        )
     }
     return children
 }

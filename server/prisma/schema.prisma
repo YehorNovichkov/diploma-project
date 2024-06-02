@@ -8,80 +8,38 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  email        String?  @unique
+  id           String       @id @default(uuid())
+  email        String?      @unique
   name         String
   surname      String
   patronymic   String
   passwordHash String?
-  student      Student?
-  teacher      Teacher?
-  parent       Parent?
-  admin        Admin?
-}
-
-model Student {
-  id         String       @id @default(uuid())
-  user       User         @relation(fields: [userId], references: [id])
-  userId     String       @unique
-  class      Class?       @relation(fields: [classId], references: [id])
-  classId    Int?
-  parent     Parent?      @relation(fields: [parentId], references: [id])
-  parentId   String?
-  TaskAnswer TaskAnswer[]
-
-  @@index([userId])
-  @@index([classId])
-  @@index([parentId])
-}
-
-model Teacher {
-  id       String    @id @default(uuid())
-  user     User      @relation(fields: [userId], references: [id])
-  userId   String    @unique
-  classes  Class[]
-  subjects Subject[]
-
-  @@index([userId])
-}
-
-model Parent {
-  id       String    @id @default(uuid())
-  user     User      @relation(fields: [userId], references: [id])
-  userId   String    @unique
-  students Student[]
-
-  @@index([userId])
-}
-
-model Admin {
-  id     String @id @default(uuid())
-  user   User   @relation(fields: [userId], references: [id])
-  userId String @unique
-
-  @@index([userId])
+  roles        String[]
+  // Student fields
+  classId      Int?
+  class        Class?       @relation(fields: [classId], references: [id])
+  parentId     String?
+  parent       User?        @relation("ParentToChildren", fields: [parentId], references: [id])
+  TaskAnswer   TaskAnswer[]
+  // Parent fields
+  children     User[]       @relation("ParentToChildren")
 }
 
 model Class {
   id       Int       @id @default(autoincrement())
   name     String
-  students Student[]
-  teacher  Teacher   @relation(fields: [userId], references: [id])
-  userId   String
+  students User[]
   subjects Subject[]
   tasks    Task[]
   tests    Test[]
-
-  @@index([userId])
 }
 
 model Subject {
-  id       Int       @id @default(autoincrement())
-  name     String
-  classes  Class[]
-  teachers Teacher[]
-  tasks    Task[]
-  tests    Test[]
+  id      Int     @id @default(autoincrement())
+  name    String
+  classes Class[]
+  tasks   Task[]
+  tests   Test[]
 }
 
 model Task {
@@ -91,7 +49,6 @@ model Task {
   description String
   deadline    DateTime
   files       String[]
-  answerTypes AnswerType[]
   subject     Subject      @relation(fields: [subjectId], references: [id])
   subjectId   Int
   class       Class        @relation(fields: [classId], references: [id])
@@ -102,18 +59,13 @@ model Task {
   @@index([classId])
 }
 
-enum AnswerType {
-  TEXT
-  FILE
-}
-
 model TaskAnswer {
   id        Int     @id @default(autoincrement())
   text      String?
   file      String?
   task      Task    @relation(fields: [taskId], references: [id])
   taskId    Int
-  student   Student @relation(fields: [studentId], references: [id])
+  student   User    @relation(fields: [studentId], references: [id])
   studentId String
 
   @@index([taskId])

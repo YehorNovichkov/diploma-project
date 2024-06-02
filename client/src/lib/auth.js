@@ -7,11 +7,7 @@ export const authOptions = {
             name: 'credentials',
             async authorize(credentials) {
                 try {
-                    const user = await getToken(
-                        credentials.email,
-                        credentials.password
-                    )
-
+                    const user = await getToken(credentials.email, credentials.password)
                     if (user) {
                         return user
                     }
@@ -23,7 +19,7 @@ export const authOptions = {
     ],
     session: {
         strategy: 'jwt',
-        maxAge: 60 * 60 * 24, // 24 hours
+        maxAge: 7 * 24 * 60 * 60, // 7 days
     },
     callbacks: {
         async jwt({ token, user }) {
