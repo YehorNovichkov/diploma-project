@@ -16,6 +16,7 @@ export default function Classes() {
     const router = useRouter()
     const [classes, setClasses] = useState([])
     const [classInputName, setClassInputName] = useState('')
+    const [filteredClassIds, setFilteredClassIds] = useState(new Set())
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -32,6 +33,10 @@ export default function Classes() {
         } catch (error) {
             console.error(error)
         }
+    }
+
+    const handleClassClick = (id) => {
+        router.push(`/workspace/admin/classes/${id}`)
     }
 
     return (
@@ -94,32 +99,50 @@ export default function Classes() {
                         <Accordion type='single' collapsible className='w-full'>
                             {[...Array(11).keys()].map((i) => {
                                 const value = `${i + 1}-`
+                                const filteredClasses = classes.filter((classItem) => classItem.name.includes(value))
+
+                                filteredClasses.forEach((classItem) => filteredClassIds.add(classItem.id))
+
                                 return (
-                                    <AccordionItem value={value}>
+                                    <AccordionItem value={value} key={value}>
                                         <AccordionTrigger>{i + 1} класи</AccordionTrigger>
                                         <AccordionContent>
-                                            {(() => {
-                                                const filteredClasses = classes.filter((classItem) => classItem.name.includes(value))
-
-                                                return filteredClasses.length > 0 ? (
-                                                    filteredClasses.map((classItem) => (
-                                                        <Card
-                                                            key={classItem.id}
-                                                            className='cursor-pointer hover:bg-muted hover:shadow-lg transition-all duration-200 ease-in-out mb-1 mt-1'
-                                                            onClick={() => {
-                                                                router.push(`classes/${classItem.id}`)
-                                                            }}>
-                                                            <CardHeader>{classItem.name}</CardHeader>
-                                                        </Card>
-                                                    ))
-                                                ) : (
-                                                    <div className='text-muted-foreground'>Немає класів</div>
-                                                )
-                                            })()}
+                                            {filteredClasses.length > 0 ? (
+                                                filteredClasses.map((classItem) => (
+                                                    <Card
+                                                        key={classItem.id}
+                                                        className='cursor-pointer hover:bg-muted hover:shadow-lg transition-all duration-200 ease-in-out mb-1 mt-1'
+                                                        onClick={() => handleClassClick(classItem.id)}>
+                                                        <CardHeader>{classItem.name}</CardHeader>
+                                                    </Card>
+                                                ))
+                                            ) : (
+                                                <div className='text-muted-foreground'>Немає класів</div>
+                                            )}
                                         </AccordionContent>
                                     </AccordionItem>
                                 )
                             })}
+
+                            <AccordionItem value='remaining' key='remaining'>
+                                <AccordionTrigger>Інші класи</AccordionTrigger>
+                                <AccordionContent>
+                                    {classes.filter((classItem) => !filteredClassIds.has(classItem.id)).length > 0 ? (
+                                        classes
+                                            .filter((classItem) => !filteredClassIds.has(classItem.id))
+                                            .map((classItem) => (
+                                                <Card
+                                                    key={classItem.id}
+                                                    className='cursor-pointer hover:bg-muted hover:shadow-lg transition-all duration-200 ease-in-out mb-1 mt-1'
+                                                    onClick={() => handleClassClick(classItem.id)}>
+                                                    <CardHeader>{classItem.name}</CardHeader>
+                                                </Card>
+                                            ))
+                                    ) : (
+                                        <div className='text-muted-foreground'>Немає класів</div>
+                                    )}
+                                </AccordionContent>
+                            </AccordionItem>
                         </Accordion>
                     </div>
                 </div>

@@ -1,8 +1,9 @@
 'use client'
 
 import { createSubject, fetchSubjects } from '@/api/subjectAPI'
+import { EditSubjectDialog } from '@/components/admin/editSubjectDialog'
 import { Button } from '@/components/ui/button'
-import { Card, CardHeader } from '@/components/ui/card'
+import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -81,7 +82,9 @@ export default function Subjects() {
                                 </div>
                                 <DialogFooter>
                                     <DialogClose asChild>
-                                        <Button onClick={handleAddSubject}>Зберегти</Button>
+                                        <Button onClick={handleAddSubject} disabled={loading}>
+                                            Зберегти
+                                        </Button>
                                     </DialogClose>
                                 </DialogFooter>
                             </DialogContent>
@@ -89,13 +92,13 @@ export default function Subjects() {
                     </div>
                     <div className='grid grid-cols-1 gap-4'>
                         {subjects.map((subjectItem) => (
-                            <Card
-                                key={subjectItem.id}
-                                className='cursor-pointer hover:bg-muted hover:shadow-lg transition-all duration-200 ease-in-out mb-1 mt-1'
-                                onClick={() => {
-                                    router.push(`subjects/${subjectItem.id}`)
-                                }}>
-                                <CardHeader>{subjectItem.name}</CardHeader>
+                            <Card key={subjectItem.id} className='mb-1 mt-1'>
+                                <CardHeader>
+                                    <div className='flex'>
+                                        <CardTitle className='flex-1'>{subjectItem.name}</CardTitle>
+                                        <EditSubjectDialog className='flex-initial' subject={subjectItem} />
+                                    </div>
+                                </CardHeader>
                             </Card>
                         ))}
                     </div>

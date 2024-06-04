@@ -1,40 +1,59 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { ModeToggle } from '@/components/ui/mode-toggle'
+import { fetchUser } from '@/api/userAPI'
 import { useAppContext } from '@/components/context/appWrapper'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { ModeToggle } from '@/components/ui/mode-toggle'
+import { serverErrors } from '@/lib/serverErrors'
+import { getCurrentUserAccessToken } from '@/lib/session'
+import { userLoginSchema } from '@/schema/userLoginSchema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { jwtDecode } from 'jwt-decode'
+import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { signIn, useSession } from 'next-auth/react'
-import { getCurrentUserAccessToken } from '@/lib/session'
-import { jwtDecode } from 'jwt-decode'
-import { fetchUser } from '@/api/userAPI'
+import { useForm } from 'react-hook-form'
 
 export default function Login() {
+    const form = useForm({
+        resolver: zodResolver(userLoginSchema),
+        defaultValues: {
+            email: '',
+            password: '',
+        },
+    })
+
     const router = useRouter()
     const { userStore } = useAppContext()
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
+    const [uploading, setUploading] = useState(false)
+    const [error, setError] = useState(null)
 
-    const handleLogin = async () => {
+    const onSubmit = async (formData) => {
+        setUploading(true)
         const res = await signIn('credentials', {
             redirect: false,
-            email: email,
-            password: password,
+            email: formData.email,
+            password: formData.password,
         })
 
         const token = await getCurrentUserAccessToken()
-        console.log(token)
         const data = jwtDecode(token)
         userStore.setUserId(data.id)
         userStore.setUserRoles(data.roles)
         const userData = await fetchUser(userStore.userId)
         userStore.setUser(userData)
         userStore.setIsAuth(true)
-        router.push('/teacher')
+        setUploading(false)
+        router.push('/workspace')
+    }
+
+    const onError = (error) => {
+        setError(error)
+        form.reset()
+        console.log(error)
     }
 
     return (
@@ -42,23 +61,44 @@ export default function Login() {
             <Card className='w-full max-w-sm'>
                 <CardHeader>
                     <CardTitle className='text-2xl'>Вхід</CardTitle>
-                    <CardDescription>Введіть ваш email нижче, для входу.</CardDescription>
+                    <CardDescription>Введіть ваш email та пароль нижче, для входу.</CardDescription>
                 </CardHeader>
                 <CardContent className='grid gap-4'>
-                    <div className='grid gap-2'>
-                        <Label htmlFor='email'>Email</Label>
-                        <Input onChange={(e) => setEmail(e.target.value)} id='email' type='email' placeholder='email@example.com' required />
-                    </div>
-                    <div className='grid gap-2'>
-                        <Label htmlFor='password'>Пароль</Label>
-                        <Input onChange={(e) => setPassword(e.target.value)} id='password' type='password' required />
-                    </div>
+                    <Form {...form}>
+                        <form className='grid gap-4 py-4 items-center' onSubmit={form.handleSubmit(onSubmit, onError)}>
+                            <FormField
+                                control={form.control}
+                                name='email'
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Email</FormLabel>
+                                        <FormControl>
+                                            <Input {...field} placeholder='example@email.com' />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name='password'
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Пароль</FormLabel>
+                                        <FormControl>
+                                            <Input {...field} type='password' placeholder='********' />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <Button type='submit' disabled={uploading}>
+                                {uploading ? <Loader2Icon className='w-5 h-5 animate-spin' /> : 'Увійти'}
+                            </Button>
+                            {error && <FormMessage type='error'>{serverErrors[error]}</FormMessage>}
+                        </form>
+                    </Form>
                 </CardContent>
-                <CardFooter>
-                    <Button className='w-full' onClick={handleLogin}>
-                        Вхід
-                    </Button>
-                </CardFooter>
             </Card>
             <div className='fixed bottom-4 right-4'>
                 <ModeToggle />

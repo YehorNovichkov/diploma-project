@@ -54,8 +54,6 @@ export function EditUserDialog({ user }) {
         parentQuery: '',
         parentId: user.parentId !== null ? user.parentId : '',
     }
-    console.log(defaultValues)
-    console.log(user)
     const form = useForm({
         resolver: zodResolver(userSchema),
         defaultValues: defaultValues,

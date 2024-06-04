@@ -297,7 +297,7 @@ export default function Users() {
                                         key={studentItem.id}
                                         className='cursor-pointer hover:bg-muted hover:shadow-lg transition-all duration-200 ease-in-out'
                                         onClick={() => {
-                                            router.push(`users/${studentItem.id}`)
+                                            router.push(`/workspace/admin/users/${studentItem.id}`)
                                         }}>
                                         <CardHeader>
                                             {studentItem.name} {studentItem.surname} {studentItem.patronymic}
@@ -355,7 +355,7 @@ export default function Users() {
                                         key={teacherItem.id}
                                         className='cursor-pointer hover:bg-muted hover:shadow-lg transition-all duration-200 ease-in-out'
                                         onClick={() => {
-                                            router.push(`users/${teacherItem.id}`)
+                                            router.push(`/workspace/admin/users/${teacherItem.id}`)
                                         }}>
                                         <CardHeader>
                                             {teacherItem.name} {teacherItem.surname} {teacherItem.patronymic}
@@ -413,7 +413,7 @@ export default function Users() {
                                         key={parentItem.id}
                                         className='cursor-pointer hover:bg-muted hover:shadow-lg transition-all duration-200 ease-in-out'
                                         onClick={() => {
-                                            router.push(`users/${parentItem.id}`)
+                                            router.push(`/workspace/admin/users/${parentItem.id}`)
                                         }}>
                                         <CardHeader>
                                             {parentItem.name} {parentItem.surname} {parentItem.patronymic}
@@ -471,7 +471,7 @@ export default function Users() {
                                         key={adminItem.id}
                                         className='cursor-pointer hover:bg-muted hover:shadow-lg transition-all duration-200 ease-in-out'
                                         onClick={() => {
-                                            router.push(`users/${adminItem.id}`)
+                                            router.push(`/workspace/admin/users/${adminItem.id}`)
                                         }}>
                                         <CardHeader>
                                             {adminItem.name} {adminItem.surname} {adminItem.patronymic}

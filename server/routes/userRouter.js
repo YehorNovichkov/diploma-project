@@ -4,7 +4,7 @@ const userController = require('../controllers/userController')
 const authMiddleware = require('../middleware/authMiddleware')
 const roleCheckMiddleware = require('../middleware/roleCheckMiddleware')
 
-router.post('/registration', userController.registration)
+router.put('/registration/:id', userController.registration)
 router.post('/login', userController.login)
 router.post('/search', authMiddleware, userController.getUsersByPartOfFullNameAndRole)
 router.post('/', authMiddleware, roleCheckMiddleware(['admin']), userController.addUser)

@@ -4,11 +4,14 @@ import { fetchClass } from '@/api/classAPI'
 import { fetchUser } from '@/api/userAPI'
 import { EditUserDialog } from '@/components/admin/editUserDialog'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Loader2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import SimpleCrypto from 'simple-crypto-js'
+import { toast } from 'sonner'
 
 const roles = [
     {
@@ -57,6 +60,13 @@ export default function User({ params }) {
         }
     }, [userItem])
 
+    const sc = new SimpleCrypto(process.env.NEXT_PUBLIC_CRYPTO_KEY)
+    const handleCopyLink = () => {
+        const link = `${process.env.NEXT_PUBLIC_BASE_URL}/register/${encodeURIComponent(sc.encrypt(userItem.id))}`
+        navigator.clipboard.writeText(link)
+        toast('Посилання скопійовано')
+    }
+
     return (
         <main>
             {loading ? (
@@ -77,7 +87,15 @@ export default function User({ params }) {
                                     </div>
                                 </div>
                             </CardTitle>
-                            <CardDescription>{userItem.email}</CardDescription>
+                            <CardDescription>
+                                {userItem.email !== null ? (
+                                    userItem.email
+                                ) : (
+                                    <Button variant='link' className='p-0' onClick={handleCopyLink}>
+                                        Скопіювати посилання для реєстрації
+                                    </Button>
+                                )}
+                            </CardDescription>
                         </CardHeader>
                         <Separator />
                         <CardContent>
@@ -98,7 +116,9 @@ export default function User({ params }) {
                                         <Card>
                                             <CardHeader>
                                                 <CardTitle>
-                                                    <Link href={`/admin/classes/${classItem.id}`} className='flex-initial hover:text-muted-foreground'>
+                                                    <Link
+                                                        href={`/workspace/admin/classes/${classItem.id}`}
+                                                        className='flex-initial hover:text-muted-foreground'>
                                                         {classItem.name}
                                                     </Link>
                                                 </CardTitle>
@@ -112,7 +132,7 @@ export default function User({ params }) {
                                         <Card>
                                             <CardHeader>
                                                 <CardTitle>
-                                                    <Link href={`/admin/users/${parentItem.id}`} className='flex-initial hover:text-muted-foreground'>
+                                                    <Link href={`/workspace/admin/users/${parentItem.id}`} className='flex-initial hover:text-muted-foreground'>
                                                         {parentItem.name} {parentItem.surname} {parentItem.patronymic}
                                                     </Link>
                                                 </CardTitle>

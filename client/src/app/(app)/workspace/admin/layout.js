@@ -17,7 +17,7 @@ export default function AdminLayout({ children }) {
                 <div className='border-b p-2'>
                     <Button
                         onClick={() => {
-                            router.push('/admin')
+                            router.push('/workspace')
                         }}
                         variant='outline'
                         size='icon'
@@ -31,7 +31,7 @@ export default function AdminLayout({ children }) {
                             <TooltipTrigger asChild>
                                 <Button
                                     onClick={() => {
-                                        router.push('/admin/classes')
+                                        router.push('/workspace/admin/classes')
                                     }}
                                     variant='ghost'
                                     size='icon'
@@ -48,7 +48,7 @@ export default function AdminLayout({ children }) {
                             <TooltipTrigger asChild>
                                 <Button
                                     onClick={() => {
-                                        router.push('/admin/subjects')
+                                        router.push('/workspace/admin/subjects')
                                     }}
                                     variant='ghost'
                                     size='icon'
@@ -65,7 +65,7 @@ export default function AdminLayout({ children }) {
                             <TooltipTrigger asChild>
                                 <Button
                                     onClick={() => {
-                                        router.push('/admin/users')
+                                        router.push('/workspace/admin/users')
                                     }}
                                     variant='ghost'
                                     size='icon'

@@ -1,7 +1,8 @@
+import { AppWrapper } from '@/components/context/appWrapper'
+import { ThemeProvider } from '@/components/theme-provider'
+import { Toaster } from '@/components/ui/sonner'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { ThemeProvider } from '@/components/theme-provider'
-import { AppWrapper } from '@/components/context/appWrapper'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -16,12 +17,9 @@ export default function RootLayout({ children }) {
             <head />
             <body className={inter.className}>
                 <AppWrapper>
-                    <ThemeProvider
-                        attribute='class'
-                        defaultTheme='system'
-                        enableSystem
-                        disableTransitionOnChange>
+                    <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
                         {children}
+                        <Toaster />
                     </ThemeProvider>
                 </AppWrapper>
             </body>

@@ -1,3 +1,4 @@
+const { parse } = require('dotenv')
 const db = require('../db')
 
 class SubjectController {
@@ -28,7 +29,7 @@ class SubjectController {
         const { id } = req.params
         const { name } = req.body
         const subject = await db.subject.update({
-            where: { id },
+            where: { id: parseInt(id) },
             data: { name },
         })
         res.json(subject)

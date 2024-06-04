@@ -10,12 +10,33 @@ const generateToken = (id, roles) => {
     })
 }
 
+const getUserRolesWithoutRequest = async (id) => {
+    const userRoles = await db.user.findUnique({
+        where: { id: id },
+        select: {
+            roles: true,
+        },
+    })
+
+    return userRoles.roles
+}
+
 class UserController {
     async registration(req, res, next) {
-        const { email, password, name, surname, patronymic } = req.body
+        const { id } = req.params
+        const { email, password } = req.body
 
         if (!validate(email, password)) {
             return next(ApiError.badRequest('INVALID_DATA'))
+        }
+
+        const existingUser = await db.user.findUnique({ where: { id } })
+        if (existingUser) {
+            if (existingUser.email || existingUser.passwordHash) {
+                return next(ApiError.badRequest('USER_ALREADY_HAS_EMAIL_AND_PASSWORD'))
+            }
+        } else {
+            return next(ApiError.badRequest('USER_DOES_NOT_EXIST'))
         }
 
         const candidate = await db.user.findUnique({ where: { email } })
@@ -24,16 +45,16 @@ class UserController {
         }
 
         const hashPassword = await bcrypt.hash(password, 5)
-        const user = await db.user.create({
+        const updatedUser = await db.user.update({
+            where: { id: id },
             data: {
                 email,
                 passwordHash: hashPassword,
-                name,
-                surname,
-                patronymic,
             },
         })
-        const token = generateToken(user.id)
+
+        const roles = await getUserRolesWithoutRequest(updatedUser.id)
+        const token = generateToken(updatedUser.id, roles)
         return res.json({ token })
     }
 
@@ -54,7 +75,7 @@ class UserController {
             return next(ApiError.badRequest('WRONG_PASSWORD'))
         }
 
-        const roles = await this.getUserRolesWithoutRequest(user.id)
+        const roles = await getUserRolesWithoutRequest(user.id)
         const token = generateToken(user.id, roles)
         return res.json({ token })
     }

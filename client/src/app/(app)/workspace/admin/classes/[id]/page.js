@@ -83,7 +83,7 @@ export default function Class({ params }) {
                                 key={studentItem.id}
                                 className='cursor-pointer hover:bg-muted hover:shadow-lg transition-all duration-200 ease-in-out'
                                 onClick={() => {
-                                    router.push(`/admin/users/${studentItem.id}`)
+                                    router.push(`/workspace/admin/users/${studentItem.id}`)
                                 }}>
                                 <CardHeader>
                                     {studentItem.name} {studentItem.surname} {studentItem.patronymic}
