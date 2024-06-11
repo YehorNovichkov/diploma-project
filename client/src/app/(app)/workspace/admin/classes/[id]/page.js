@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Loader2Icon, PencilLineIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 export default function Class({ params }) {
     const router = useRouter()
@@ -32,6 +33,7 @@ export default function Class({ params }) {
         try {
             const data = await updateClass(classInputName)
             setClassItem(data)
+            toast.success('Клас успішно відредаговано')
         } catch (error) {
             console.error(error)
         }

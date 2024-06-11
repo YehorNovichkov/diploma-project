@@ -1,39 +1,27 @@
+'use client'
+
+import { useAppContext } from '@/components/context/appWrapper'
 import { Button } from '@/components/ui/button'
 import { ModeToggle } from '@/components/ui/mode-toggle'
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-    TooltipProvider,
-} from '@/components/ui/tooltip'
-import {
-    Bird,
-    Book,
-    Bot,
-    Code2,
-    CornerDownLeft,
-    LifeBuoy,
-    Mic,
-    Paperclip,
-    Rabbit,
-    Settings,
-    Settings2,
-    Share,
-    SquareTerminal,
-    SquareUser,
-    Triangle,
-    Turtle,
-    School,
-    BookText,
-    BookCheck,
-} from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { BookCheck, ListTodo, SquareUser, Triangle } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 export default function StudentLayout({ children }) {
+    const router = useRouter()
+    const { userStore } = useAppContext()
+
     return (
         <div className='grid h-screen w-full pl-[56px]'>
             <aside className='inset-y fixed  left-0 z-20 flex h-full flex-col border-r'>
                 <div className='border-b p-2'>
-                    <Button variant='outline' size='icon' aria-label='Home'>
+                    <Button
+                        onClick={() => {
+                            router.push('/workspace')
+                        }}
+                        variant='outline'
+                        size='icon'
+                        aria-label='Home'>
                         <Triangle className='size-5 fill-foreground' />
                     </Button>
                 </div>
@@ -42,29 +30,35 @@ export default function StudentLayout({ children }) {
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
+                                    onClick={() => {
+                                        router.push('/workspace/student/tasks')
+                                    }}
                                     variant='ghost'
                                     size='icon'
                                     className='rounded-lg'
-                                    aria-label='Завдання'>
-                                    <BookText className='size-5' />
+                                    aria-label='Класи'>
+                                    <BookCheck className='size-5' />
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent side='right' sideOffset={5}>
-                                Завдання
+                                Класи
                             </TooltipContent>
                         </Tooltip>
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
+                                    onClick={() => {
+                                        router.push('/workspace/student/tests')
+                                    }}
                                     variant='ghost'
                                     size='icon'
                                     className='rounded-lg'
-                                    aria-label='Тести'>
-                                    <BookCheck className='size-5' />
+                                    aria-label='Предмети'>
+                                    <ListTodo className='size-5' />
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent side='right' sideOffset={5}>
-                                Тести
+                                Предмети
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
@@ -74,6 +68,9 @@ export default function StudentLayout({ children }) {
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
+                                    onClick={() => {
+                                        router.push('/profile')
+                                    }}
                                     variant='ghost'
                                     size='icon'
                                     className='mt-auto rounded-lg'
@@ -82,7 +79,7 @@ export default function StudentLayout({ children }) {
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent side='right' sideOffset={5}>
-                                Обліковий запис
+                                {userStore.user.email}
                             </TooltipContent>
                         </Tooltip>
                         <ModeToggle />

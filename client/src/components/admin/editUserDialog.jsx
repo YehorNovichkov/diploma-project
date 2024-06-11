@@ -1,18 +1,10 @@
 'use client'
 
-import { fetchClassesByName } from '@/api/classAPI'
-import { fetchUsersByFullNameAndRole, updateUser } from '@/api/userAPI'
+import { fetchClass, fetchClassesByName } from '@/api/classAPI'
+import { fetchUser, fetchUsersByFullNameAndRole, updateUser } from '@/api/userAPI'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
@@ -22,6 +14,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2Icon, PencilLineIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 
 const rolesNames = [
     {
@@ -42,7 +35,7 @@ const rolesNames = [
     },
 ]
 
-export function EditUserDialog({ user }) {
+export function EditUserDialog({ user, setUser }) {
     const defaultValues = {
         name: user.name,
         surname: user.surname,
@@ -74,6 +67,17 @@ export function EditUserDialog({ user }) {
     const [dialogOpen, setDialogOpen] = useState(false)
     const [uploading, setUploading] = useState(false)
     const [error, setError] = useState(null)
+
+    useEffect(() => {
+        if (rolesValues.includes('student')) {
+            fetchClass(classIdValue).then((classItem) => {
+                setClasses([classItem])
+            })
+            fetchUser(parentIdValue).then((parent) => {
+                setParents([parent])
+            })
+        }
+    }, [])
 
     useEffect(() => {
         if (!rolesValues.includes('student')) {
@@ -108,13 +112,14 @@ export function EditUserDialog({ user }) {
         }
     }, [parentQueryValue])
 
-    const onSubmit = async (data) => {
+    const onSubmit = async (values) => {
         setUploading(true)
-        const values = form.getValues()
         await updateUser(user.id, values.name, values.surname, values.patronymic, values.roles, values.classId, values.parentId)
-            .then(() => {
+            .then((data) => {
                 form.reset()
                 setDialogOpen(false)
+                setUser(data)
+                toast.success('Користувача успішно змінено')
             })
             .catch((e) => {
                 setError(e)
@@ -135,7 +140,7 @@ export function EditUserDialog({ user }) {
                     <PencilLineIcon className='h-4' />
                 </Button>
             </DialogTrigger>
-            <DialogContent className='sm:max-w-[425px] overflow-y-scroll max-h-screen'>
+            <DialogContent className='sm:max-w-[600px] overflow-y-scroll max-h-screen'>
                 <DialogHeader>
                     <DialogTitle>Додати користувача</DialogTitle>
                     <DialogDescription>Введіть дані користувача та натисніть зберегти</DialogDescription>
@@ -233,35 +238,43 @@ export function EditUserDialog({ user }) {
                                                 <FormLabel>Клас</FormLabel>
                                                 <FormDescription>Оберіть до якого класу буде відноситись учень</FormDescription>
                                             </div>
-                                            {classIdValue !== '' && (
-                                                <div className='mb-2'>
-                                                    <FormLabel>Обраний клас: {classes.find((c) => c.id === parseInt(classIdValue))?.name}</FormLabel>
-                                                </div>
-                                            )}
                                             <FormControl>
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger>
-                                                        <Button variant='outline'>Обрати клас</Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent>
-                                                        <DropdownMenuLabel>
-                                                            <Input {...field} placeholder='Пошук класу' />
-                                                        </DropdownMenuLabel>
-                                                        <DropdownMenuSeparator />
-                                                        {classesLoading && (
-                                                            <DropdownMenuItem>
-                                                                <Skeleton className='h-8' />
-                                                            </DropdownMenuItem>
-                                                        )}
-                                                        {classes.map((classItem) => (
-                                                            <DropdownMenuItem
-                                                                key={classItem.id}
-                                                                onClick={() => form.setValue('classId', classItem.id.toString())}>
-                                                                {classItem.name}
-                                                            </DropdownMenuItem>
-                                                        ))}
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
+                                                <Popover open={classPopoverOpen} onOpenChange={setClassPopoverOpen} modal>
+                                                    <PopoverTrigger asChild>
+                                                        <Button variant='outline'>
+                                                            {classIdValue === '' ? (
+                                                                'Обрати клас'
+                                                            ) : (
+                                                                <>
+                                                                    <GraduationCapIcon className='mr-2 h-4 w-4' />
+                                                                    {'Обраний клас: '}
+                                                                    {classes.find((c) => c.id === parseInt(classIdValue))?.name}
+                                                                </>
+                                                            )}
+                                                        </Button>
+                                                    </PopoverTrigger>
+
+                                                    <PopoverContent>
+                                                        <Input {...field} placeholder='Пошук класу' />
+                                                        <ScrollArea className='h-[150px] mt-2'>
+                                                            {classesLoading && <Skeleton className='h-8' />}
+                                                            {classes.map((classItem) => (
+                                                                <>
+                                                                    <Separator className='my-2' />
+                                                                    <div
+                                                                        className='text-sm cursor-pointer hover:text-muted-foreground p-1'
+                                                                        key={classItem.id}
+                                                                        onClick={() => {
+                                                                            form.setValue('classId', classItem.id.toString())
+                                                                            setClassPopoverOpen(false)
+                                                                        }}>
+                                                                        {classItem.name}
+                                                                    </div>
+                                                                </>
+                                                            ))}
+                                                        </ScrollArea>
+                                                    </PopoverContent>
+                                                </Popover>
                                             </FormControl>
                                         </FormItem>
                                     )}
@@ -278,33 +291,50 @@ export function EditUserDialog({ user }) {
                                                     Оберіть користувача, що буде вважатись батьком/мати учня та зможе переглядати його успішність
                                                 </FormDescription>
                                             </div>
-                                            {parentIdValue !== '' && (
-                                                <div className='mb-2'>
-                                                    <FormLabel>
-                                                        Обраний користувач: {parents.find((c) => c.id === parentIdValue)?.name}{' '}
-                                                        {parents.find((c) => c.id === parentIdValue)?.surname}{' '}
-                                                        {parents.find((c) => c.id === parentIdValue)?.patronymic}
-                                                    </FormLabel>
-                                                </div>
-                                            )}
                                             <FormControl>
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger>
-                                                        <Button variant='outline'>Обрати користувача</Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent>
-                                                        <DropdownMenuLabel>
-                                                            <Input {...field} placeholder='Пошук облікового запису' />
-                                                        </DropdownMenuLabel>
-                                                        <DropdownMenuSeparator />
-                                                        {parentsLoading && <Skeleton className='h-8' />}
-                                                        {parents.map((parentItem) => (
-                                                            <DropdownMenuItem key={parentItem.id} onClick={() => form.setValue('parentId', parentItem.id)}>
-                                                                {parentItem.name + ' ' + parentItem.surname + ' ' + parentItem.patronymic}
-                                                            </DropdownMenuItem>
-                                                        ))}
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
+                                                <Popover open={parentPopoverOpen} onOpenChange={setParentPopoverOpen} modal>
+                                                    <PopoverTrigger asChild>
+                                                        <Button variant='outline' className='max-w-[550px] flex items-center'>
+                                                            {parentIdValue === '' ? (
+                                                                'Обрати користувача'
+                                                            ) : (
+                                                                <>
+                                                                    <UserIcon className='mr-2 h-4 w-4' />
+                                                                    {'Обраний користувач: '}
+                                                                    <span className='overflow-hidden overflow-ellipsis whitespace-nowrap ml-1'>
+                                                                        {parents.find((c) => c.id === parentIdValue)?.name}{' '}
+                                                                        {parents.find((c) => c.id === parentIdValue)?.surname}{' '}
+                                                                        {parents.find((c) => c.id === parentIdValue)?.patronymic}
+                                                                    </span>
+                                                                </>
+                                                            )}
+                                                        </Button>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent>
+                                                        <Input {...field} placeholder='Пошук облікового запису' />
+                                                        <ScrollArea className='h-[150px] mt-2'>
+                                                            {parentsLoading && <Skeleton className='h-8' />}
+                                                            {parents.map((parentItem) => (
+                                                                <>
+                                                                    <Separator className='my-2' />
+                                                                    <div
+                                                                        className='text-sm cursor-pointer hover:text-muted-foreground p-1'
+                                                                        key={parentItem.id}
+                                                                        onClick={() => {
+                                                                            form.setValue('parentId', parentItem.id)
+                                                                            setParentPopoverOpen(false)
+                                                                            console.log(
+                                                                                parents.find((c) => c.id === parseInt(parentIdValue))?.name,
+                                                                                parentIdValue
+                                                                            )
+                                                                        }}>
+                                                                        {parentItem.name + ' ' + parentItem.surname + ' ' + parentItem.patronymic}
+                                                                    </div>
+                                                                </>
+                                                            ))}
+                                                        </ScrollArea>
+                                                    </PopoverContent>
+                                                </Popover>
                                             </FormControl>
                                         </FormItem>
                                     )}

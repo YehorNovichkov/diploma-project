@@ -26,29 +26,27 @@ model User {
 }
 
 model Class {
-  id       Int       @id @default(autoincrement())
+  id       Int    @id @default(autoincrement())
   name     String
   students User[]
-  subjects Subject[]
   tasks    Task[]
   tests    Test[]
 }
 
 model Subject {
-  id      Int     @id @default(autoincrement())
-  name    String
-  classes Class[]
-  tasks   Task[]
-  tests   Test[]
+  id    Int    @id @default(autoincrement())
+  name  String
+  tasks Task[]
+  tests Test[]
 }
 
 model Task {
   id          Int          @id @default(autoincrement())
-  created_at  DateTime     @default(now())
+  createdAt   DateTime     @default(now())
   name        String
   description String
   deadline    DateTime
-  files       String[]
+  filesCount  Int          @default(0)
   subject     Subject      @relation(fields: [subjectId], references: [id])
   subjectId   Int
   class       Class        @relation(fields: [classId], references: [id])
@@ -60,13 +58,15 @@ model Task {
 }
 
 model TaskAnswer {
-  id        Int     @id @default(autoincrement())
-  text      String?
-  file      String?
-  task      Task    @relation(fields: [taskId], references: [id])
-  taskId    Int
-  student   User    @relation(fields: [studentId], references: [id])
-  studentId String
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  text       String
+  filesCount Int      @default(0)
+  mark       Int?
+  task       Task     @relation(fields: [taskId], references: [id])
+  taskId     Int
+  student    User     @relation(fields: [studentId], references: [id])
+  studentId  String
 
   @@index([taskId])
   @@index([studentId])
@@ -74,7 +74,7 @@ model TaskAnswer {
 
 model Test {
   id          Int            @id @default(autoincrement())
-  created_at  DateTime       @default(now())
+  createdAt   DateTime       @default(now())
   name        String
   description String
   deadline    DateTime

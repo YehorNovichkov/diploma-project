@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PlusIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 export default function Subjects() {
     const [subjects, setSubjects] = useState([])
@@ -27,6 +28,7 @@ export default function Subjects() {
         try {
             const data = await createSubject(subjectInputName)
             setSubjects([...subjects, data])
+            toast.success('Предмет успішно додано')
         } catch (error) {
             console.error(error)
         }
@@ -91,12 +93,20 @@ export default function Subjects() {
                         </Dialog>
                     </div>
                     <div className='grid grid-cols-1 gap-4'>
-                        {subjects.map((subjectItem) => (
+                        {subjects.map((subjectItem, index) => (
                             <Card key={subjectItem.id} className='mb-1 mt-1'>
                                 <CardHeader>
                                     <div className='flex'>
                                         <CardTitle className='flex-1'>{subjectItem.name}</CardTitle>
-                                        <EditSubjectDialog className='flex-initial' subject={subjectItem} />
+                                        <EditSubjectDialog
+                                            className='flex-initial'
+                                            subject={subjectItem}
+                                            setSubject={(updatedSubject) => {
+                                                let newSubjects = [...subjects]
+                                                newSubjects[index] = updatedSubject
+                                                setSubjects(newSubjects)
+                                            }}
+                                        />
                                     </div>
                                 </CardHeader>
                             </Card>

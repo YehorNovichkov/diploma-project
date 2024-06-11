@@ -9,14 +9,39 @@ import { Label } from '@/components/ui/label'
 import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { debounce } from 'lodash'
 import { SearchIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 export default function Users() {
     const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [activeTab, setActiveTab] = useState('students')
+
+    const debouncedFetchUsers = useCallback(
+        debounce((query, role) => {
+            fetchUsersByFullNameAndRole(query, role).then((data) => {
+                switch (role) {
+                    case 'student':
+                        setStudents(data)
+                        break
+                    case 'teacher':
+                        setTeachers(data)
+                        break
+                    case 'parent':
+                        setParents(data)
+                        break
+                    case 'admin':
+                        setAdmins(data)
+                        break
+                    default:
+                        break
+                }
+            })
+        }, 500),
+        []
+    )
 
     const [students, setStudents] = useState([])
     const [currentStudentsPage, setCurrentStudentsPage] = useState(1)
@@ -58,9 +83,7 @@ export default function Users() {
 
     useEffect(() => {
         if (studentsSearchQuery.length >= 4) {
-            fetchUsersByFullNameAndRole(studentsSearchQuery, 'student').then((data) => {
-                setStudents(data)
-            })
+            debouncedFetchUsers(studentsSearchQuery, 'student')
         }
         if (studentsSearchQuery.length === 0) {
             setLoading(true)
@@ -69,9 +92,8 @@ export default function Users() {
                 setTotalStudents(data.total)
                 setLoading(false)
             })
-            setLoading(false)
         }
-    }, [studentsSearchQuery])
+    }, [studentsSearchQuery, debouncedFetchUsers])
 
     const [teachers, setTeachers] = useState([])
     const [currentTeachersPage, setCurrentTeachersPage] = useState(1)
@@ -103,9 +125,7 @@ export default function Users() {
 
     useEffect(() => {
         if (teachersSearchQuery.length >= 4) {
-            fetchUsersByFullNameAndRole(teachersSearchQuery, 'teacher').then((data) => {
-                setTeachers(data)
-            })
+            debouncedFetchUsers(teachersSearchQuery, 'teacher')
         }
         if (teachersSearchQuery.length === 0) {
             setLoading(true)
@@ -114,9 +134,8 @@ export default function Users() {
                 setTotalTeachers(data.total)
                 setLoading(false)
             })
-            setLoading(false)
         }
-    }, [teachersSearchQuery])
+    }, [teachersSearchQuery, debouncedFetchUsers])
 
     const [parents, setParents] = useState([])
     const [currentParentsPage, setCurrentParentsPage] = useState(1)
@@ -148,9 +167,7 @@ export default function Users() {
 
     useEffect(() => {
         if (parentsSearchQuery.length >= 4) {
-            fetchUsersByFullNameAndRole(parentsSearchQuery, 'parent').then((data) => {
-                setParents(data)
-            })
+            debouncedFetchUsers(parentsSearchQuery, 'parent')
         }
         if (parentsSearchQuery.length === 0) {
             setLoading(true)
@@ -193,9 +210,7 @@ export default function Users() {
 
     useEffect(() => {
         if (adminsSearchQuery.length >= 4) {
-            fetchUsersByFullNameAndRole(adminsSearchQuery, 'admin').then((data) => {
-                setAdmins(data)
-            })
+            debouncedFetchUsers(adminsSearchQuery, 'admin')
         }
         if (adminsSearchQuery.length === 0) {
             setLoading(true)
@@ -269,7 +284,7 @@ export default function Users() {
                             <TabsTrigger value='admins'>Адміни</TabsTrigger>
                         </TabsList>
                         <TabsContent value='students'>
-                            <div className='grid grid-cols-2 gap-4 mt-4 justify-items-end'>
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 justify-items-center md:justify-items-end'>
                                 <div>
                                     <Label htmlFor='studentSearch'>
                                         <SearchIcon className='h-10' />

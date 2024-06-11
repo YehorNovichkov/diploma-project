@@ -7,8 +7,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { PencilLineIcon } from 'lucide-react'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
-export function EditSubjectDialog({ subject }) {
+export function EditSubjectDialog({ subject, setSubject }) {
     const [subjectName, setSubjectName] = useState(subject.name)
     const [dialogOpen, setDialogOpen] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -16,8 +17,11 @@ export function EditSubjectDialog({ subject }) {
     const handleUpdateSubject = async () => {
         setLoading(true)
         try {
-            await updateSubject(subject.id, subjectName)
-            setDialogOpen(false)
+            await updateSubject(subject.id, subjectName).then((data) => {
+                setSubject(data)
+                setDialogOpen(false)
+                toast.success('Предмет успішно оновлено')
+            })
         } catch (error) {
             console.error(error)
         }

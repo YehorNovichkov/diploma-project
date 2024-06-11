@@ -17,6 +17,13 @@ export const fetchSubject = async (id) => {
     return data
 }
 
+export const fetchSubjectsByName = async (query) => {
+    const { data } = await $authHost.post(`api/subject/search`, {
+        query,
+    })
+    return data
+}
+
 export const updateSubject = async (id, name) => {
     const { data } = await $authHost.put(`api/subject/${id}`, {
         name,

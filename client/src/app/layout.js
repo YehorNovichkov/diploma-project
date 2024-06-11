@@ -1,6 +1,7 @@
 import { AppWrapper } from '@/components/context/appWrapper'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
+
 import { Inter } from 'next/font/google'
 import './globals.css'
 

@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 export default function Classes() {
     const router = useRouter()
@@ -30,6 +31,7 @@ export default function Classes() {
         try {
             const data = await createClass(classInputName)
             setClasses([...classes, data])
+            toast.success('Клас успішно створено')
         } catch (error) {
             console.error(error)
         }

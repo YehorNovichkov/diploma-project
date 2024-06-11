@@ -2,7 +2,9 @@
 
 import { fetchUser } from '@/api/userAPI'
 import { useAppContext } from '@/components/context/appWrapper'
+import { authenticator } from '@/lib/imagekit'
 import { getCurrentUserAccessToken } from '@/lib/session'
+import { IKContext } from 'imagekitio-react'
 import { jwtDecode } from 'jwt-decode'
 import { Loader2Icon } from 'lucide-react'
 import { signOut } from 'next-auth/react'
@@ -33,10 +35,16 @@ export default function AppLayout({ children }) {
 
     useEffect(() => {
         if (userStore.isAuth === true) {
-            setDataLoaded(true)
-            if (!checkAccess(userStore.user.roles, pathname)) {
+            if (!checkAccess(userStore.user.roles, pathname) && pathname.includes('/workspace/')) {
                 router.push('/not-authorized')
+                return
+            } else {
+                if (pathname.includes('/login') || pathname.includes('/register')) {
+                    router.push('/workspace')
+                    return
+                }
             }
+            setDataLoaded(true)
             return
         }
 
@@ -45,10 +53,6 @@ export default function AppLayout({ children }) {
             await fetchUser(userStore.userId).then((res) => {
                 userStore.setUser(res)
                 userStore.setIsAuth(true)
-                setDataLoaded(true)
-                if (!checkAccess(res.roles, pathname)) {
-                    router.push('/not-authorized')
-                }
             })
         }
 
@@ -58,7 +62,19 @@ export default function AppLayout({ children }) {
                 const currentTime = Date.now().valueOf() / 1000
 
                 if (decodedToken.exp > currentTime) {
-                    setUser(decodedToken)
+                    setUser(decodedToken).then(() => {
+                        if (!checkAccess(userStore.user.roles, pathname) && pathname.includes('/workspace/')) {
+                            router.push('/not-authorized')
+                            return
+                        } else {
+                            if (pathname.includes('/login') || pathname.includes('/register')) {
+                                router.push('/workspace')
+                                return
+                            }
+                        }
+                        setDataLoaded(true)
+                        return
+                    })
                 } else {
                     signOut({ redirect: false })
                     if (!pathname.includes('/login') && !pathname.includes('/register')) {
@@ -82,5 +98,12 @@ export default function AppLayout({ children }) {
             </div>
         )
     }
-    return children
+    return (
+        <IKContext
+            publicKey={process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY}
+            urlEndpoint={process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT}
+            authenticator={authenticator}>
+            {children}
+        </IKContext>
+    )
 }

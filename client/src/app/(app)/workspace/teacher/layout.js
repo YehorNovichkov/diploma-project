@@ -1,23 +1,11 @@
 'use client'
 
+import { useAppContext } from '@/components/context/appWrapper'
 import { Button } from '@/components/ui/button'
 import { ModeToggle } from '@/components/ui/mode-toggle'
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-    TooltipProvider,
-} from '@/components/ui/tooltip'
-import {
-    SquareUser,
-    Triangle,
-    School,
-    BookText,
-    BookCheck,
-    LogIn,
-} from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { BookCheck, ListTodo, SquareUser, Triangle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useAppContext } from '@/components/context/appWrapper'
 import { useEffect, useState } from 'react'
 
 export default function TeacherLayout({ children }) {
@@ -36,7 +24,7 @@ export default function TeacherLayout({ children }) {
                 <div className='border-b p-2'>
                     <Button
                         onClick={() => {
-                            router.push('/teacher')
+                            router.push('/workspace')
                         }}
                         variant='outline'
                         size='icon'
@@ -50,30 +38,13 @@ export default function TeacherLayout({ children }) {
                             <TooltipTrigger asChild>
                                 <Button
                                     onClick={() => {
-                                        router.push('/teacher/classes')
-                                    }}
-                                    variant='ghost'
-                                    size='icon'
-                                    className='rounded-lg'
-                                    aria-label='Класи'>
-                                    <School className='size-5' />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent side='right' sideOffset={5}>
-                                Класи
-                            </TooltipContent>
-                        </Tooltip>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    onClick={() => {
-                                        router.push('/teacher/tasks')
+                                        router.push('/workspace/teacher/tasks')
                                     }}
                                     variant='ghost'
                                     size='icon'
                                     className='rounded-lg'
                                     aria-label='Завдання'>
-                                    <BookText className='size-5' />
+                                    <BookCheck className='size-5' />
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent side='right' sideOffset={5}>
@@ -84,13 +55,13 @@ export default function TeacherLayout({ children }) {
                             <TooltipTrigger asChild>
                                 <Button
                                     onClick={() => {
-                                        router.push('/teacher/tests')
+                                        router.push('/workspace/teacher/tests')
                                     }}
                                     variant='ghost'
                                     size='icon'
                                     className='rounded-lg'
                                     aria-label='Тести'>
-                                    <BookCheck className='size-5' />
+                                    <ListTodo className='size-5' />
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent side='right' sideOffset={5}>
@@ -105,7 +76,7 @@ export default function TeacherLayout({ children }) {
                             <TooltipTrigger asChild>
                                 <Button
                                     onClick={() => {
-                                        router.push('/teacher/profile')
+                                        router.push('/profile')
                                     }}
                                     variant='ghost'
                                     size='icon'

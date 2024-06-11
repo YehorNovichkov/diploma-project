@@ -1,5 +1,6 @@
 const Router = require('express')
 const router = new Router()
+const ImageKit = require('imagekit')
 
 const userRouter = require('./userRouter')
 const classRouter = require('./classRouter')
@@ -18,5 +19,16 @@ router.use('/taskAnswer', taskAnswerRouter)
 router.use('/test', testRouter)
 router.use('/testQuestion', testQuestionRouter)
 router.use('/testAnswer', testAnswerRouter)
+
+const imagekit = new ImageKit({
+    urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT,
+    publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
+    privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
+})
+
+router.get('/imagekit-auth', (req, res) => {
+    var result = imagekit.getAuthenticationParameters()
+    res.send(result)
+})
 
 module.exports = router

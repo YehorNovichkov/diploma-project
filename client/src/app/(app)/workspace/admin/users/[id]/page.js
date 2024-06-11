@@ -83,7 +83,7 @@ export default function User({ params }) {
                                         {userItem.name} {userItem.surname} {userItem.patronymic}
                                     </div>
                                     <div className='flex-initial'>
-                                        <EditUserDialog user={userItem} />
+                                        <EditUserDialog user={userItem} setUser={setUserItem} />
                                     </div>
                                 </div>
                             </CardTitle>

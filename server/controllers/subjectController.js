@@ -21,8 +21,17 @@ class SubjectController {
 
     async getOneSubject(req, res) {
         const { id } = req.params
-        const subject = await db.subject.findUnique({ where: { id } })
+        const subject = await db.subject.findUnique({ where: { id: parseInt(id) } })
         res.json(subject)
+    }
+
+    async getSubjectsByName(req, res) {
+        const { query } = req.body
+        const sanitizedQuery = query.trim().toLowerCase()
+        const subjects = await db.subject.findMany({
+            where: { name: { contains: sanitizedQuery, mode: 'insensitive' } },
+        })
+        res.json(subjects)
     }
 
     async updateSubject(req, res) {

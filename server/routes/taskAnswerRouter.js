@@ -1,24 +1,17 @@
 const Router = require('express')
 const router = new Router()
 const taskAnswerController = require('../controllers/taskAnswerController')
-const roleCheckMiddleware = require('../middleware/roleCheckMiddleware')
+const checkRole = require('../middleware/roleCheckMiddleware')
+const authMiddleware = require('../middleware/authMiddleware')
 
-router.post(
-    '/',
-    roleCheckMiddleware(['teacher', 'admin']),
-    taskAnswerController.createTaskAnswer
-)
-router.get('/', taskAnswerController.getTaskAnswers)
-router.get('/:id', taskAnswerController.getOneTaskAnswer)
-router.put(
-    '/:id',
-    roleCheckMiddleware(['teacher', 'admin']),
-    taskAnswerController.updateTaskAnswer
-)
-router.delete(
-    '/:id',
-    roleCheckMiddleware(['teacher', 'admin']),
-    taskAnswerController.deleteTaskAnswer
-)
+router.post('/', authMiddleware, checkRole(['admin', 'teacher', 'student']), taskAnswerController.createTaskAnswer)
+router.get('/', authMiddleware, checkRole(['admin', 'teacher', 'student']), taskAnswerController.getTaskAnswers)
+router.get('/byTaskAndStudent', checkRole(['admin', 'teacher', 'student']), authMiddleware, taskAnswerController.getTaskAnswerByTaskAndStudent)
+router.get('/byTask/:taskId', authMiddleware, checkRole(['admin', 'teacher', 'student']), taskAnswerController.getTaskAnswersByTask)
+router.get('/:id', authMiddleware, checkRole(['admin', 'teacher', 'student']), taskAnswerController.getOneTaskAnswer)
+router.put('/:id', authMiddleware, checkRole(['admin', 'teacher', 'student']), taskAnswerController.updateTaskAnswer)
+router.patch('/:id', authMiddleware, checkRole(['admin', 'teacher', 'student']), taskAnswerController.updateTaskAnswerFilesCount)
+router.patch('/mark/:id', authMiddleware, checkRole(['admin', 'teacher']), taskAnswerController.updateTaskAnswerMark)
+router.delete('/:id', authMiddleware, checkRole(['admin', 'teacher', 'student']), taskAnswerController.deleteTaskAnswer)
 
 module.exports = router

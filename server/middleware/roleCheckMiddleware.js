@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken')
 const db = require('../db')
 const { getUserRolesWithoutRequest } = require('../controllers/userController')
 
-module.exports = function (role) {
+module.exports = function (roles) {
     return async function (req, res, next) {
         if (req.method === 'OPTIONS') {
             next()
@@ -19,7 +19,7 @@ module.exports = function (role) {
 
             const userRoles = await getUserRolesWithoutRequest(decoded.id)
 
-            if (userRoles.every((r) => !role.includes(r))) {
+            if (userRoles.every((r) => !roles.includes(r))) {
                 return res.status(403).json({ message: 'forbidden' })
             }
 
