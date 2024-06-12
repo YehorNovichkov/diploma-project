@@ -1,6 +1,7 @@
 'use client'
 
 import { fetchTaskAnswer, updateTaskAnswerMark } from '@/api/taskAnswerAPI'
+import Comments from '@/components/teacher-student/comments'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
@@ -150,6 +151,8 @@ export default function TaskAnswer({ params }) {
                             </CardContent>
                         </Card>
                     )}
+
+                    <Comments taskAnswerId={parseInt(params.id)} />
 
                     {isDialogOpen && (
                         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

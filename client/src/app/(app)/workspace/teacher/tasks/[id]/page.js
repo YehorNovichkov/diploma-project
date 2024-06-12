@@ -34,7 +34,6 @@ export default function TaskDetails({ params }) {
         })
         fetchTaskAnswersByTask(params.id).then((data) => {
             setAnswers(data)
-            console.log(data)
             setLoading(false)
         })
     }, [])

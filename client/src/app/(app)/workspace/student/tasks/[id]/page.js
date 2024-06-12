@@ -3,6 +3,7 @@
 import { fetchTask } from '@/api/taskAPI'
 import { createTaskAnswer, fetchTaskAnswerByTaskAndStudent, updateTaskAnswerFilesCount } from '@/api/taskAnswerAPI'
 import { useAppContext } from '@/components/context/appWrapper'
+import Comments from '@/components/teacher-student/comments'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
@@ -195,54 +196,57 @@ export default function TaskDetails({ params }) {
                     </Card>
 
                     {taskAnswer && (
-                        <Card className='w-full mb-4'>
-                            <CardHeader>
-                                <CardTitle>Твої зображення</CardTitle>
-                            </CardHeader>
+                        <>
+                            <Card className='w-full mb-4'>
+                                <CardHeader>
+                                    <CardTitle>Твої зображення</CardTitle>
+                                </CardHeader>
 
-                            <CardContent className='grid grid-cols-1 items-center justify-center align-middle gap-4'>
-                                {taskAnswer.filesCount > 0 && (
-                                    <Carousel className='w-full max-w-xs justify-self-center'>
-                                        <CarouselContent className='align-middle items-center'>
-                                            {[...Array(parseInt(taskAnswer.filesCount))].map((_, index) => (
-                                                <CarouselItem key={index} className='md:basis-1/2 lg:basis-1/3'>
-                                                    <Image
-                                                        className='rounded-lg hover:cursor-pointer'
-                                                        loader={imageKitLoader}
-                                                        src={'task-answer/' + taskAnswer.id + '_' + (index + 1)}
-                                                        alt={'Зображення відповіді ' + (index + 1)}
-                                                        width={200}
-                                                        height={200}
-                                                        loading='lazy'
-                                                        lqip={{ active: true }}
-                                                        priority={false}
-                                                        quality={50}
-                                                        placeholder='empty'
-                                                        onClick={() => handleImageClick('task-answer', index)}
-                                                    />
-                                                </CarouselItem>
-                                            ))}
-                                        </CarouselContent>
-                                        <CarouselPrevious />
-                                        <CarouselNext />
-                                    </Carousel>
-                                )}
+                                <CardContent className='grid grid-cols-1 items-center justify-center align-middle gap-4'>
+                                    {taskAnswer.filesCount > 0 && (
+                                        <Carousel className='w-full max-w-xs justify-self-center'>
+                                            <CarouselContent className='align-middle items-center'>
+                                                {[...Array(parseInt(taskAnswer.filesCount))].map((_, index) => (
+                                                    <CarouselItem key={index} className='md:basis-1/2 lg:basis-1/3'>
+                                                        <Image
+                                                            className='rounded-lg hover:cursor-pointer'
+                                                            loader={imageKitLoader}
+                                                            src={'task-answer/' + taskAnswer.id + '_' + (index + 1)}
+                                                            alt={'Зображення відповіді ' + (index + 1)}
+                                                            width={200}
+                                                            height={200}
+                                                            loading='lazy'
+                                                            lqip={{ active: true }}
+                                                            priority={false}
+                                                            quality={50}
+                                                            placeholder='empty'
+                                                            onClick={() => handleImageClick('task-answer', index)}
+                                                        />
+                                                    </CarouselItem>
+                                                ))}
+                                            </CarouselContent>
+                                            <CarouselPrevious />
+                                            <CarouselNext />
+                                        </Carousel>
+                                    )}
 
-                                <IKUpload
-                                    fileName={taskAnswer.id + '_' + (parseInt(taskAnswer.filesCount) + 1)}
-                                    folder={'/task-answer'}
-                                    validateFile={(file) => file.size < 20000000}
-                                    useUniqueFileName={false}
-                                    style={{ display: 'none' }}
-                                    ref={ikUploadRef}
-                                    onError={handleUploadError}
-                                    onSuccess={handleUploadSuccess}
-                                />
-                                <Button variant='outline' onClick={() => ikUploadRef.current.click()}>
-                                    <PlusCircle />
-                                </Button>
-                            </CardContent>
-                        </Card>
+                                    <IKUpload
+                                        fileName={taskAnswer.id + '_' + (parseInt(taskAnswer.filesCount) + 1)}
+                                        folder={'/task-answer'}
+                                        validateFile={(file) => file.size < 20000000}
+                                        useUniqueFileName={false}
+                                        style={{ display: 'none' }}
+                                        ref={ikUploadRef}
+                                        onError={handleUploadError}
+                                        onSuccess={handleUploadSuccess}
+                                    />
+                                    <Button variant='outline' onClick={() => ikUploadRef.current.click()}>
+                                        <PlusCircle />
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                            <Comments taskAnswerId={parseInt(taskAnswer.id)} />
+                        </>
                     )}
 
                     {isDialogOpen && (

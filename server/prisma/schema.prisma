@@ -8,21 +8,23 @@ datasource db {
 }
 
 model User {
-  id           String       @id @default(uuid())
-  email        String?      @unique
-  name         String
-  surname      String
-  patronymic   String
-  passwordHash String?
-  roles        String[]
+  id                 String               @id @default(uuid())
+  email              String?              @unique
+  name               String
+  surname            String
+  patronymic         String
+  passwordHash       String?
+  roles              String[]
   // Student fields
-  classId      Int?
-  class        Class?       @relation(fields: [classId], references: [id])
-  parentId     String?
-  parent       User?        @relation("ParentToChildren", fields: [parentId], references: [id])
-  TaskAnswer   TaskAnswer[]
+  classId            Int?
+  class              Class?               @relation(fields: [classId], references: [id])
+  parentId           String?
+  parent             User?                @relation("ParentToChildren", fields: [parentId], references: [id])
+  TaskAnswer         TaskAnswer[]
   // Parent fields
-  children     User[]       @relation("ParentToChildren")
+  children           User[]               @relation("ParentToChildren")
+  // Comments fields
+  TaskAnswerComments TaskAnswerComments[]
 }
 
 model Class {
@@ -58,18 +60,32 @@ model Task {
 }
 
 model TaskAnswer {
-  id         Int      @id @default(autoincrement())
-  createdAt  DateTime @default(now())
-  text       String
-  filesCount Int      @default(0)
-  mark       Int?
-  task       Task     @relation(fields: [taskId], references: [id])
-  taskId     Int
-  student    User     @relation(fields: [studentId], references: [id])
-  studentId  String
+  id                 Int                  @id @default(autoincrement())
+  createdAt          DateTime             @default(now())
+  text               String
+  filesCount         Int                  @default(0)
+  mark               Int?
+  task               Task                 @relation(fields: [taskId], references: [id])
+  taskId             Int
+  student            User                 @relation(fields: [studentId], references: [id])
+  studentId          String
+  TaskAnswerComments TaskAnswerComments[]
 
   @@index([taskId])
   @@index([studentId])
+}
+
+model TaskAnswerComments {
+  id           Int        @id @default(autoincrement())
+  createdAt    DateTime   @default(now())
+  text         String
+  taskAnswer   TaskAnswer @relation(fields: [taskAnswerId], references: [id])
+  taskAnswerId Int
+  author       User       @relation(fields: [authorId], references: [id])
+  authorId     String
+
+  @@index([taskAnswerId])
+  @@index([authorId])
 }
 
 model Test {
