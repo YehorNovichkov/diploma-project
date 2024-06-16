@@ -7,11 +7,13 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { userSchema } from '@/schema/userSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2Icon, PencilLineIcon } from 'lucide-react'
+import { GraduationCapIcon, Loader2Icon, PencilLineIcon, UserIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -58,11 +60,13 @@ export function EditUserDialog({ user, setUser }) {
     const classIdValue = form.watch('classId')
     const [classes, setClasses] = useState([])
     const [classesLoading, setClassesLoading] = useState(false)
+    const [classPopoverOpen, setClassPopoverOpen] = useState(false)
 
     const parentQueryValue = form.watch('parentQuery')
     const parentIdValue = form.watch('parentId')
     const [parents, setParents] = useState([])
     const [parentsLoading, setParentsLoading] = useState(false)
+    const [parentPopoverOpen, setParentPopoverOpen] = useState(false)
 
     const [dialogOpen, setDialogOpen] = useState(false)
     const [uploading, setUploading] = useState(false)

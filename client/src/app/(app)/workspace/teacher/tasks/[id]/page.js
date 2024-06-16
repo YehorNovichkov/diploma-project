@@ -14,7 +14,7 @@ import { getTimeUntilDeadline } from '@/lib/timeUntilDeadlineFormer'
 import { format } from 'date-fns'
 import { toZonedTime } from 'date-fns-tz'
 import { IKUpload } from 'imagekitio-react'
-import { Loader2Icon, PlusCircle } from 'lucide-react'
+import { Loader2Icon, PlusCircle, SquareXIcon } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
@@ -147,15 +147,25 @@ export default function TaskDetails({ params }) {
                                 onClick={() => {
                                     router.push(`/workspace/teacher/task-answer/${answer.id}`)
                                 }}>
-                                <CardHeader>
-                                    <div className='flex justify-between items-center align-middle'>
-                                        <CardTitle className='text-lg font-normal'>
-                                            {answer.student.name} {answer.student.surname} {answer.student.patronymic}
-                                        </CardTitle>
-                                        <span className='text-sm text-muted-foreground'>
-                                            {format(toZonedTime(new Date(answer.createdAt), 'Europe/Kyiv'), 'dd.MM.yy HH:mm')}
-                                        </span>
-                                        {answer.mark && <CardDescription>Оцінка: {answer.mark}/12</CardDescription>}
+                                <CardHeader className='p-4'>
+                                    <div>
+                                        <div className='flex justify-between items-center align-middle'>
+                                            <CardTitle className='text-lg font-normal'>
+                                                {answer.student.name} {answer.student.surname} {answer.student.patronymic}
+                                            </CardTitle>
+                                            <span className='text-sm text-muted-foreground'>
+                                                {format(toZonedTime(new Date(answer.createdAt), 'Europe/Kyiv'), 'dd.MM.yy HH:mm')}
+                                            </span>
+                                        </div>
+                                        <CardDescription>
+                                            {answer.mark ? (
+                                                <>Оцінка: {answer.mark}/12</>
+                                            ) : (
+                                                <>
+                                                    <SquareXIcon className='w-2 h-2' /> Не оцінено
+                                                </>
+                                            )}
+                                        </CardDescription>
                                     </div>
                                 </CardHeader>
                             </Card>

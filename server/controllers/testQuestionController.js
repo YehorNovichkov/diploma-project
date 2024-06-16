@@ -2,45 +2,64 @@ const db = require('../db')
 
 class TestQuestionController {
     async createTestQuestion(req, res) {
-        try {
-            const { text, file, answers, manualAnswer, testId } = req.body
-            const question = await db.question.create({
-                data: {
-                    text,
-                    file,
-                    answers,
-                    manualAnswer,
-                    test: { connect: { id: testId } },
-                },
-            })
-            res.json(question)
-        } catch (e) {
-            res.status(500).json(e)
-        }
+        const { text, isManual, testId } = req.body
+        const question = await db.testQuestion.create({
+            data: {
+                text,
+                isManual,
+                test: { connect: { id: parseInt(testId) } },
+            },
+        })
+        res.json(question)
     }
 
     async getTestQuestions(req, res) {
-        const questions = await db.question.findMany()
+        const questions = await db.testQuestion.findMany()
+        res.json(questions)
+    }
+
+    async getTestQuestionsByTestId(req, res) {
+        const { testId } = req.params
+        const questions = await db.testQuestion.findMany({ where: { testId: parseInt(testId) } })
+        res.json(questions)
+    }
+
+    async getTestQuestionIdsByTestId(req, res) {
+        const { testId } = req.params
+        const questions = await db.testQuestion.findMany({
+            where: { testId: parseInt(testId) },
+            select: { id: true },
+        })
         res.json(questions)
     }
 
     async getOneTestQuestion(req, res) {
         const { id } = req.params
-        const question = await db.question.findUnique({ where: { id } })
+        const question = await db.testQuestion.findUnique({ where: { id: parseInt(id) } })
         res.json(question)
     }
 
     async updateTestQuestion(req, res) {
         const { id } = req.params
-        const { text, file, answers, manualAnswer, testId } = req.body
-        const question = await db.question.update({
-            where: { id },
+        const { text, isManual, testId } = req.body
+        const question = await db.testQuestion.update({
+            where: { id: parseInt(id) },
             data: {
                 text,
-                file,
-                answers,
-                manualAnswer,
+                isManual,
                 test: { connect: { id: testId } },
+            },
+        })
+        res.json(question)
+    }
+
+    async updateTestQuestionFilesCount(req, res) {
+        const { id } = req.params
+        const { filesCount } = req.body
+        const question = await db.testQuestion.update({
+            where: { id: parseInt(id) },
+            data: {
+                filesCount,
             },
         })
         res.json(question)
@@ -48,7 +67,7 @@ class TestQuestionController {
 
     async deleteTestQuestion(req, res) {
         const { id } = req.params
-        const question = await db.question.delete({ where: { id } })
+        const question = await db.testQuestion.delete({ where: { id: parseInt(id) } })
         res.json(question)
     }
 }

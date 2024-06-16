@@ -1,4 +1,4 @@
-import { differenceInDays, differenceInHours, isBefore } from 'date-fns'
+import { differenceInMinutes, isBefore } from 'date-fns'
 
 const pluralizeUkrainian = (number, singular, plural, few) => {
     if (number % 10 === 1 && number % 100 !== 11) {
@@ -15,20 +15,19 @@ export const getTimeUntilDeadline = (deadline) => {
     const deadlineDate = new Date(deadline)
 
     const isOverdue = isBefore(deadlineDate, now)
-    const hoursDifference = Math.abs(differenceInHours(deadlineDate, now))
-    const daysDifference = Math.abs(differenceInDays(deadlineDate, now))
+    const totalMinutesDifference = Math.abs(differenceInMinutes(deadlineDate, now))
+
+    const daysDifference = Math.floor(totalMinutesDifference / 1440) // 1440 minutes in a day
+    const hoursDifference = Math.floor((totalMinutesDifference % 1440) / 60)
+    const minutesDifference = totalMinutesDifference % 60
+
+    const daysText = `${daysDifference} ${pluralizeUkrainian(daysDifference, 'день', 'днів', 'дні')}`
+    const hoursText = `${hoursDifference} ${pluralizeUkrainian(hoursDifference, 'година', 'годин', 'години')}`
+    const minutesText = `${minutesDifference} ${pluralizeUkrainian(minutesDifference, 'хвилина', 'хвилин', 'хвилини')}`
 
     if (isOverdue) {
-        if (hoursDifference < 24) {
-            return `${hoursDifference} ${pluralizeUkrainian(hoursDifference, 'година', 'годин', 'години')} тому`
-        } else {
-            return `${daysDifference} ${pluralizeUkrainian(daysDifference, 'день', 'днів', 'дні')} тому`
-        }
+        return `З часу дедлайну ${daysText}, ${hoursText} та ${minutesText}`
     } else {
-        if (hoursDifference < 24) {
-            return `${hoursDifference} ${pluralizeUkrainian(hoursDifference, 'година залишилась', 'годин залишилось', 'години залишилось')}`
-        } else {
-            return `${daysDifference} ${pluralizeUkrainian(daysDifference, 'день залишився', 'днів залишилось', 'дні залишилось')}`
-        }
+        return `До дедлайну ${daysText}, ${hoursText} та ${minutesText}`
     }
 }

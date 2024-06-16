@@ -21,6 +21,7 @@ model User {
   parentId           String?
   parent             User?                @relation("ParentToChildren", fields: [parentId], references: [id])
   TaskAnswer         TaskAnswer[]
+  TestResult         TestResult[]
   // Parent fields
   children           User[]               @relation("ParentToChildren")
   // Comments fields
@@ -45,6 +46,7 @@ model Subject {
 model Task {
   id          Int          @id @default(autoincrement())
   createdAt   DateTime     @default(now())
+  hidden      Boolean      @default(true)
   name        String
   description String
   deadline    DateTime
@@ -65,9 +67,9 @@ model TaskAnswer {
   text               String
   filesCount         Int                  @default(0)
   mark               Int?
-  task               Task                 @relation(fields: [taskId], references: [id])
-  taskId             Int
-  student            User                 @relation(fields: [studentId], references: [id])
+  task               Task?                @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  taskId             Int?
+  student            User                 @relation(fields: [studentId], references: [id], onDelete: Cascade)
   studentId          String
   TaskAnswerComments TaskAnswerComments[]
 
@@ -89,40 +91,74 @@ model TaskAnswerComments {
 }
 
 model Test {
-  id          Int            @id @default(autoincrement())
-  createdAt   DateTime       @default(now())
-  name        String
-  description String
-  deadline    DateTime
-  subject     Subject        @relation(fields: [subjectId], references: [id])
-  subjectId   Int
-  class       Class          @relation(fields: [classId], references: [id])
-  classId     Int
-  questions   TestQuestion[]
+  id         Int            @id @default(autoincrement())
+  createdAt  DateTime       @default(now())
+  hidden     Boolean        @default(true)
+  name       String
+  deadline   DateTime
+  timeLimit  Int
+  subject    Subject        @relation(fields: [subjectId], references: [id])
+  subjectId  Int
+  class      Class          @relation(fields: [classId], references: [id])
+  classId    Int
+  questions  TestQuestion[]
+  testResult TestResult[]
 
   @@index([subjectId])
   @@index([classId])
 }
 
 model TestQuestion {
-  id           Int          @id @default(autoincrement())
-  text         String
-  file         String?
-  testAnswers  TestAnswer[]
-  manualAnswer String?
-  test         Test         @relation(fields: [testId], references: [id])
-  testId       Int
+  id            Int                 @id @default(autoincrement())
+  text          String
+  filesCount    Int                 @default(0)
+  isManual      Boolean             @default(false)
+  test          Test                @relation(fields: [testId], references: [id], onDelete: Cascade)
+  testId        Int
+  testAnswers   TestAnswer[]
+  studentAnswer StudentTestAnswer[]
 
   @@index([testId])
 }
 
 model TestAnswer {
-  id         Int          @id @default(autoincrement())
-  text       String
-  file       String?
-  isCorrect  Boolean
-  question   TestQuestion @relation(fields: [questionId], references: [id])
-  questionId Int
+  id            Int                 @id @default(autoincrement())
+  text          String
+  isCorrect     Boolean
+  question      TestQuestion        @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId    Int
+  studentAnswer StudentTestAnswer[]
 
   @@index([questionId])
+}
+
+model TestResult {
+  id          Int                 @id @default(autoincrement())
+  createdAt   DateTime            @default(now())
+  completedAt DateTime?
+  mark        Float?
+  test        Test?               @relation(fields: [testId], references: [id], onDelete: SetNull)
+  testId      Int?
+  student     User                @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId   String
+  answers     StudentTestAnswer[]
+
+  @@index([testId])
+  @@index([studentId])
+}
+
+model StudentTestAnswer {
+  id           Int          @id @default(autoincrement())
+  createdAt    DateTime     @default(now())
+  manualAnswer String?
+  answer       TestAnswer?  @relation(fields: [answerId], references: [id], onDelete: Cascade)
+  answerId     Int?
+  question     TestQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId   Int
+  result       TestResult   @relation(fields: [resultId], references: [id], onDelete: Cascade)
+  resultId     Int
+
+  @@index([answerId])
+  @@index([questionId])
+  @@index([resultId])
 }

@@ -11,6 +11,8 @@ const taskAnswerCommentsRouter = require('./taskAnswerCommentsRouter')
 const testRouter = require('./testRouter')
 const testQuestionRouter = require('./testQuestionRouter')
 const testAnswerRouter = require('./testAnswerRouter')
+const testResultRouter = require('./testResultRouter')
+const studentTestAnswerRouter = require('./studentTestAnswerRouter')
 
 router.use('/user', userRouter)
 router.use('/class', classRouter)
@@ -21,6 +23,8 @@ router.use('/taskAnswerComment', taskAnswerCommentsRouter)
 router.use('/test', testRouter)
 router.use('/testQuestion', testQuestionRouter)
 router.use('/testAnswer', testAnswerRouter)
+router.use('/testResult', testResultRouter)
+router.use('/studentTestAnswer', studentTestAnswerRouter)
 
 const imagekit = new ImageKit({
     urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT,

@@ -344,6 +344,7 @@ export default function Tasks() {
                             ))}
                         </div>
                     )}
+
                     {totalTasks > limit && (
                         <Pagination className='mt-4'>
                             <PaginationContent>
