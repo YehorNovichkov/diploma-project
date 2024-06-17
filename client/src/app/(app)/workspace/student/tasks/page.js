@@ -44,10 +44,11 @@ export default function Tasks() {
     const [subjectPopoverOpen, setSubjectPopoverOpen] = useState(false)
 
     const classIdValue = userStore.user.classId
+    console.log(classIdValue)
 
     const debouncedFetchTasks = useCallback(
         debounce((limit, page, sort, sortDirection, classId, subjectId, includeOverdue, name) => {
-            fetchTasks(limit, page, sort, sortDirection, classId, subjectId, includeOverdue, name).then((data) => {
+            fetchTasks(limit, page, sort, sortDirection, classId, subjectId, includeOverdue, name, false).then((data) => {
                 setTasks(data.tasks)
                 setTotalTasks(data.total)
                 setLoading(false)

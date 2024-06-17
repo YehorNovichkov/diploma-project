@@ -20,7 +20,8 @@ export const fetchTasks = async (
     classId = null,
     subjectId = null,
     includeOverdue = 'true',
-    name = null
+    name = null,
+    hidden = null
 ) => {
     const params = new URLSearchParams()
 
@@ -33,6 +34,7 @@ export const fetchTasks = async (
     if (classId) params.append('classId', classId)
     if (subjectId) params.append('subjectId', subjectId)
     if (name) params.append('name', name)
+    if (hidden !== null) params.append('hidden', hidden)
 
     const { data } = await $authHost.get('/api/task', { params })
 
@@ -57,5 +59,10 @@ export const updateTask = async (id, name, description, deadline, classId, subje
 
 export const updateTaskFilesCount = async (id, filesCount) => {
     const { data } = await $authHost.patch(`api/task/${id}`, { filesCount })
+    return data
+}
+
+export const updateHiddenTask = async (id, hidden) => {
+    const { data } = await $authHost.patch(`api/task/hidden/${id}`, { hidden })
     return data
 }

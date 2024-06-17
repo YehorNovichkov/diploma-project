@@ -5,13 +5,18 @@ export const fetchTestResult = async (id) => {
     return data
 }
 
+export const fetchTestResultsByStudentId = async (studentId) => {
+    const { data } = await $authHost.get(`api/testResult/studentId/${studentId}`)
+    return data
+}
+
 export const fetchTestResultByStudentIdTestId = async (studentId, testId) => {
     const { data } = await $authHost.post(`api/testResult/studentIdTestId/`, { studentId, testId })
     return data
 }
 
-export const fetchTestResults = async () => {
-    const { data } = await $authHost.get('api/testResult')
+export const fetchTestResultsByTestId = async (testId) => {
+    const { data } = await $authHost.get(`api/testResult/testId/${testId}`)
     return data
 }
 
@@ -25,6 +30,11 @@ export const createTestResult = async (studentId, testId) => {
 
 export const completeTestResult = async (id) => {
     const { data } = await $authHost.patch(`api/testResult/${id}`)
+    return data
+}
+
+export const fetchAvarageTestMarkByStudentId = async (studentId) => {
+    const { data } = await $authHost.get(`api/testResult/avgMark/${studentId}`)
     return data
 }
 

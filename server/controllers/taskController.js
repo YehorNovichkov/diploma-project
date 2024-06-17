@@ -25,6 +25,7 @@ class TaskController {
             subjectId = null,
             includeOverdue = 'true',
             name = null,
+            hidden = null,
         } = req.query
 
         const validSortFields = ['deadline', 'name', 'createdAt']
@@ -41,6 +42,10 @@ class TaskController {
         if (classId) filters.classId = parseInt(classId, 10)
         if (subjectId) filters.subjectId = parseInt(subjectId, 10)
         if (name) filters.name = { contains: name, mode: 'insensitive' }
+        if (hidden !== null) {
+            const showHidden = hidden === 'true'
+            filters.hidden = showHidden
+        }
 
         const includeOverdueBool = includeOverdue === 'true'
 
@@ -111,6 +116,18 @@ class TaskController {
             include: {
                 class: true,
                 subject: true,
+            },
+        })
+        res.json(task)
+    }
+
+    async updateHiddenTask(req, res) {
+        const { id } = req.params
+        const { hidden } = req.body
+        const task = await db.task.update({
+            where: { id: parseInt(id, 10) },
+            data: {
+                hidden,
             },
         })
         res.json(task)

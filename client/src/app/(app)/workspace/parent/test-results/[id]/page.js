@@ -78,8 +78,7 @@ export default function TestResultDetails({ params }) {
                     <Card className='mt-4'>
                         <CardHeader>
                             <CardTitle>
-                                Результат учня {testResult.student.name} {testResult.student.surname} {testResult.student.patronymic}:{' '}
-                                {(testResult.mark * 100).toFixed(2)}% ({(testResult.mark * 12).toFixed(0)})
+                                Результат дитини: {(testResult.mark * 100).toFixed(2)}% ({(testResult.mark * 12).toFixed(0)})
                             </CardTitle>
                             <CardDescription>
                                 Дата та час початку: {format(toZonedTime(new Date(testResult.createdAt), 'Europe/Kyiv'), 'dd.MM.yy HH:mm')}

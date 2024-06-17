@@ -13,7 +13,8 @@ export const fetchTests = async (
     classId = null,
     subjectId = null,
     includeOverdue = 'true',
-    name = null
+    name = null,
+    hidden = null
 ) => {
     const params = new URLSearchParams()
 
@@ -26,6 +27,7 @@ export const fetchTests = async (
     if (classId) params.append('classId', classId)
     if (subjectId) params.append('subjectId', subjectId)
     if (name) params.append('name', name)
+    if (hidden !== null) params.append('hidden', hidden)
 
     const { data } = await $authHost.get('api/test', { params })
     return data
@@ -50,6 +52,11 @@ export const updateTest = async (id, name, deadline, timeLimit, classId, subject
         classId,
         subjectId,
     })
+    return data
+}
+
+export const updateHiddenTest = async (id, hidden) => {
+    const { data } = await $authHost.patch(`api/test/${id}`, { hidden })
     return data
 }
 

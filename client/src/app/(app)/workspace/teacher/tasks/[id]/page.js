@@ -1,19 +1,22 @@
 'use client'
 
 import { fetchTaskAnswersByTask } from '@/api/taskAnswerAPI'
-import { fetchTask, updateTaskFilesCount } from '@/api/taskAPI'
+import { fetchTask, updateHiddenTask, updateTaskFilesCount } from '@/api/taskAPI'
 import { EditTaskDialog } from '@/components/teacher/editTaskDialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
+import { Switch } from '@/components/ui/switch'
 import { createMarkup } from '@/lib/createMarkup'
 import { imageKitLoader } from '@/lib/imagekit'
 import { getTimeUntilDeadline } from '@/lib/timeUntilDeadlineFormer'
 import { format } from 'date-fns'
 import { toZonedTime } from 'date-fns-tz'
 import { IKUpload } from 'imagekitio-react'
+import { debounce } from 'lodash'
 import { Loader2Icon, PlusCircle, SquareXIcon } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -25,12 +28,14 @@ export default function TaskDetails({ params }) {
     const ikUploadRef = useRef(null)
     const [task, setTask] = useState(null)
     const [answers, setAnswers] = useState([])
+    const [hidden, setHidden] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
     useEffect(() => {
         fetchTask(params.id).then((data) => {
             setTask(data)
+            setHidden(data.hidden)
         })
         fetchTaskAnswersByTask(params.id).then((data) => {
             setAnswers(data)
@@ -51,6 +56,14 @@ export default function TaskDetails({ params }) {
             setLoading(false)
         })
     }
+
+    const handleHiddenChange = debounce(() => {
+        updateHiddenTask(task.id, !hidden).then(() => {
+            const prevHidden = hidden
+            setHidden(!prevHidden)
+            toast.success(`Завдання ${!prevHidden ? 'приховано' : 'відкрито'}`)
+        })
+    }, 200)
 
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [selectedImageIndex, setSelectedImageIndex] = useState(0)
@@ -83,6 +96,10 @@ export default function TaskDetails({ params }) {
                             <CardDescription>
                                 {task.class.name} • {task.subject.name} • Дедлайн:{' '}
                                 {format(toZonedTime(new Date(task.deadline), 'Europe/Kyiv'), 'dd.MM.yy HH:mm')} ({getTimeUntilDeadline(task.deadline)})
+                                <div className='flex items-center space-x-2 mt-2'>
+                                    <Label htmlFor='hidden'>Приховане: </Label>
+                                    <Switch id='hidden' checked={hidden} onCheckedChange={handleHiddenChange} />
+                                </div>
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -138,7 +155,7 @@ export default function TaskDetails({ params }) {
                     </Card>
 
                     <Separator className='mb-4' />
-                    <div className='text-2xl font-semibold mb-4'>Відповіді</div>
+                    <div className='text-2xl font-semibold mb-4'>Відповіді учнів:</div>
                     {answers.length > 0 ? (
                         answers.map((answer) => (
                             <Card

@@ -77,3 +77,8 @@ export const fetchUsersByFullNameAndRole = async (query, role = null) => {
 
     return data
 }
+
+export const resetUser = async (id) => {
+    const { data } = await $authHost.patch(`api/user/reset/${id}`)
+    return data
+}

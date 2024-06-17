@@ -48,8 +48,7 @@ export default function Tests() {
 
     const debouncedFetchTests = useCallback(
         debounce((limit, page, sort, sortDirection, classId, subjectId, includeOverdue, name) => {
-            fetchTests(limit, page, sort, sortDirection, classId, subjectId, includeOverdue, name).then((data) => {
-                console.log(data)
+            fetchTests(limit, page, sort, sortDirection, classId, subjectId, includeOverdue, name, false).then((data) => {
                 setTests(data.tests)
                 setTotalTests(data.total)
                 setLoading(false)

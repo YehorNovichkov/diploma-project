@@ -25,6 +25,7 @@ class TestController {
             subjectId = null,
             includeOverdue = 'true',
             name = null,
+            hidden = null,
         } = req.query
 
         const validSortFields = ['deadline', 'name', 'createdAt']
@@ -41,6 +42,10 @@ class TestController {
         if (classId) filters.classId = parseInt(classId, 10)
         if (subjectId) filters.subjectId = parseInt(subjectId, 10)
         if (name) filters.name = { contains: name, mode: 'insensitive' }
+        if (hidden !== null) {
+            const showHidden = hidden === 'true'
+            filters.hidden = showHidden
+        }
 
         const includeOverdueBool = includeOverdue === 'true'
 
@@ -92,6 +97,18 @@ class TestController {
             include: {
                 class: true,
                 subject: true,
+            },
+        })
+        res.json(test)
+    }
+
+    async updateHiddenTest(req, res) {
+        const { id } = req.params
+        const { hidden } = req.body
+        const test = await db.test.update({
+            where: { id: parseInt(id, 10) },
+            data: {
+                hidden,
             },
         })
         res.json(test)

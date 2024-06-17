@@ -1,13 +1,24 @@
 'use client'
 
 import { fetchClass } from '@/api/classAPI'
-import { fetchUser } from '@/api/userAPI'
+import { fetchUser, resetUser } from '@/api/userAPI'
 import { EditUserDialog } from '@/components/admin/editUserDialog'
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { Loader2Icon } from 'lucide-react'
+import { ListRestartIcon, Loader2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import SimpleCrypto from 'simple-crypto-js'
@@ -60,6 +71,13 @@ export default function User({ params }) {
         }
     }, [userItem])
 
+    const handleUserReset = () => {
+        resetUser(params.id).then((data) => {
+            setUserItem(data)
+            toast.success('Дані входу користувача скинуто')
+        })
+    }
+
     const sc = new SimpleCrypto(process.env.NEXT_PUBLIC_CRYPTO_KEY)
     const handleCopyLink = () => {
         const link = `${process.env.NEXT_PUBLIC_BASE_URL}/register/${encodeURIComponent(sc.encrypt(userItem.id))}`
@@ -82,7 +100,27 @@ export default function User({ params }) {
                                     <div className='flex-1 mr-6'>
                                         {userItem.name} {userItem.surname} {userItem.patronymic}
                                     </div>
-                                    <div className='flex-initial'>
+                                    <div className='flex'>
+                                        <AlertDialog>
+                                            <AlertDialogTrigger className='mr-2'>
+                                                <Button className='ml-auto h-7' variant='outline'>
+                                                    <ListRestartIcon className='h-4' />
+                                                </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle>Скинути дані входу користувача</AlertDialogTitle>
+                                                    <AlertDialogDescription>
+                                                        Ця дія скине дані входу користувача. Щоб увійти в систему, йому потрібно буде знову зареєструватися за
+                                                        посиланням.
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel>Скасувати</AlertDialogCancel>
+                                                    <AlertDialogAction onClick={handleUserReset}>Скинути</AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
                                         <EditUserDialog user={userItem} setUser={setUserItem} />
                                     </div>
                                 </div>

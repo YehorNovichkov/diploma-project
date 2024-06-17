@@ -1,28 +1,14 @@
 const Router = require('express')
 const router = new Router()
 const taskController = require('../controllers/testController')
-const roleCheckMiddleware = require('../middleware/roleCheckMiddleware')
+const authMiddleware = require('../middleware/authMiddleware')
+const checkRole = require('../middleware/roleCheckMiddleware')
 
-router.post(
-    '/',
-    roleCheckMiddleware(['teacher', 'admin']),
-    taskController.createTest
-)
-
-router.get('/', taskController.getTests)
-
-router.get('/:id', taskController.getOneTest)
-
-router.put(
-    '/:id',
-    roleCheckMiddleware(['teacher', 'admin']),
-    taskController.updateTest
-)
-
-router.delete(
-    '/:id',
-    roleCheckMiddleware(['teacher', 'admin']),
-    taskController.deleteTest
-)
+router.post('/', authMiddleware, checkRole(['teacher', 'admin']), taskController.createTest)
+router.get('/', authMiddleware, taskController.getTests)
+router.get('/:id', authMiddleware, taskController.getOneTest)
+router.put('/:id', authMiddleware, checkRole(['teacher', 'admin']), taskController.updateTest)
+router.patch('/:id', authMiddleware, checkRole(['teacher', 'admin']), taskController.updateHiddenTest)
+router.delete('/:id', authMiddleware, checkRole(['teacher', 'admin']), taskController.deleteTest)
 
 module.exports = router

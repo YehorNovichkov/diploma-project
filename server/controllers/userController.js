@@ -129,6 +129,14 @@ class UserController {
                 roles: true,
                 classId: true,
                 parentId: true,
+                children: {
+                    select: {
+                        id: true,
+                        name: true,
+                        surname: true,
+                        patronymic: true,
+                    },
+                },
             },
         })
         res.json(user)
@@ -237,6 +245,38 @@ class UserController {
 
         const users = await db.user.findMany(findManyParams)
         res.json(users)
+    }
+
+    async resetUser(req, res, next) {
+        const { id } = req.params
+
+        const updatedUser = await db.user.update({
+            where: { id: id },
+            data: {
+                email: null,
+                passwordHash: null,
+            },
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                surname: true,
+                patronymic: true,
+                roles: true,
+                classId: true,
+                parentId: true,
+                children: {
+                    select: {
+                        id: true,
+                        name: true,
+                        surname: true,
+                        patronymic: true,
+                    },
+                },
+            },
+        })
+
+        res.json(updatedUser)
     }
 
     async getUserRolesWithoutRequest(id) {

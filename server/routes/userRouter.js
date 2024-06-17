@@ -13,5 +13,6 @@ router.get('/roles/:id', userController.getUserRoles)
 router.get('/by-role/:role', authMiddleware, userController.getUsersByRole)
 router.get('/by-class/:classId', authMiddleware, userController.getUsersByClass)
 router.put('/:id', authMiddleware, roleCheckMiddleware(['admin']), userController.updateUser)
+router.patch('/reset/:id', authMiddleware, roleCheckMiddleware(['admin']), userController.resetUser)
 
 module.exports = router

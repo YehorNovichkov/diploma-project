@@ -12,8 +12,45 @@ class TestResultController {
         res.json(testResult)
     }
 
-    async getTestResults(req, res) {
-        const testResults = await db.testResult.findMany()
+    async getTestResultsByTestId(req, res) {
+        const { testId } = req.params
+        const testResults = await db.testResult.findMany({
+            where: { testId: parseInt(testId) },
+            include: {
+                student: {
+                    select: {
+                        id: true,
+                        name: true,
+                        surname: true,
+                        patronymic: true,
+                    },
+                },
+            },
+        })
+        res.json(testResults)
+    }
+
+    async getTestResultsByStudentId(req, res) {
+        const { studentId } = req.params
+        const testResults = await db.testResult.findMany({
+            where: { studentId: studentId },
+            include: {
+                test: {
+                    include: {
+                        class: true,
+                        subject: true,
+                    },
+                },
+                student: {
+                    select: {
+                        id: true,
+                        name: true,
+                        surname: true,
+                        patronymic: true,
+                    },
+                },
+            },
+        })
         res.json(testResults)
     }
 
@@ -105,7 +142,8 @@ class TestResultController {
         testResult.answers.forEach((studentAnswer) => {
             const question = studentAnswer.question
 
-            const hasCorrectAnswers = question.testAnswers.some((testAnswer) => testAnswer.isCorrect)
+            const correctTestAnswers = question.testAnswers.filter((testAnswer) => testAnswer.isCorrect)
+            const hasCorrectAnswers = correctTestAnswers.length > 0
             const hasAnyAnswers = question.testAnswers.length > 0
 
             if (!hasAnyAnswers || !hasCorrectAnswers) {
@@ -113,15 +151,23 @@ class TestResultController {
             }
 
             if (question.isManual) {
-                const correctManualAnswers = question.testAnswers
-                    .filter((testAnswer) => testAnswer.isCorrect)
-                    .map((testAnswer) => testAnswer.text.toLowerCase().trim())
+                const correctManualAnswers = correctTestAnswers.map((testAnswer) => testAnswer.text.toLowerCase().trim())
 
                 if (correctManualAnswers.includes(studentAnswer.manualAnswer?.toLowerCase().trim())) {
                     correctAnswers++
                 }
-            } else if (studentAnswer.answer && studentAnswer.answer.isCorrect) {
-                correctAnswers++
+            } else {
+                const studentAnswersForQuestion = testResult.answers.filter((ans) => ans.questionId === question.id)
+
+                const correctStudentAnswers = studentAnswersForQuestion.filter(
+                    (ans) => ans.answer && correctTestAnswers.some((correctAnswer) => correctAnswer.id === ans.answer.id)
+                )
+
+                if (correctStudentAnswers.length === correctTestAnswers.length) {
+                    correctAnswers++
+                } else {
+                    correctAnswers += correctStudentAnswers.length / correctTestAnswers.length
+                }
             }
 
             totalConsideredAnswers++
@@ -138,6 +184,20 @@ class TestResultController {
         })
 
         res.json(result)
+    }
+
+    async getAvarageMarkByStudentId(req, res) {
+        const { studentId } = req.params
+        const aggregations = await db.testResult.aggregate({
+            _avg: {
+                mark: true,
+            },
+            where: {
+                studentId,
+            },
+        })
+
+        res.json({ avgMark: aggregations._avg.mark })
     }
 
     async deleteTestResult(req, res) {

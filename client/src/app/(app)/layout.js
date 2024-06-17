@@ -39,8 +39,16 @@ export default function AppLayout({ children }) {
                 router.push('/not-authorized')
                 return
             } else {
+                if (pathname == '/workspace') {
+                    if (userStore.user.roles.length == 1) {
+                        router.push(accessRules[userStore.user.roles[0]])
+                    }
+                    return
+                }
                 if (pathname.includes('/login') || pathname.includes('/register')) {
-                    router.push('/workspace')
+                    if (userStore.user.roles.length == 1) {
+                        router.push(accessRules[userStore.user.roles[0]])
+                    } else router.push('/workspace')
                     return
                 }
             }
@@ -67,8 +75,16 @@ export default function AppLayout({ children }) {
                             router.push('/not-authorized')
                             return
                         } else {
+                            if (pathname == '/workspace') {
+                                if (userStore.user.roles.length == 1) {
+                                    router.push(accessRules[userStore.user.roles[0]])
+                                }
+                                return
+                            }
                             if (pathname.includes('/login') || pathname.includes('/register')) {
-                                router.push('/workspace')
+                                if (userStore.user.roles.length == 1) {
+                                    router.push(accessRules[userStore.user.roles[0]])
+                                } else router.push('/workspace')
                                 return
                             }
                         }

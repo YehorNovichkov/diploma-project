@@ -24,12 +24,22 @@ export const fetchTaskAnswersByTask = async (taskId) => {
     return data
 }
 
+export const fetchTaskAnswersByStudent = async (studentId) => {
+    const { data } = await $authHost.get(`api/taskAnswer/byStudent/${studentId}`)
+    return data
+}
+
 export const fetchTaskAnswerByTaskAndStudent = async (taskId, studentId) => {
     const params = new URLSearchParams()
     params.append('taskId', taskId)
     params.append('studentId', studentId)
 
     const { data } = await $authHost.get('api/taskAnswer/byTaskAndStudent', { params })
+    return data
+}
+
+export const fetchAvarageTaskMarkByStudentId = async (studentId) => {
+    const { data } = await $authHost.get(`api/taskAnswer/avgMark/${studentId}`)
     return data
 }
 

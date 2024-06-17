@@ -8,6 +8,7 @@ router.post('/', authMiddleware, checkRole(['teacher', 'admin']), taskController
 router.get('/', authMiddleware, taskController.getTasks)
 router.get('/:id', authMiddleware, taskController.getOneTask)
 router.put('/:id', authMiddleware, checkRole(['teacher', 'admin']), taskController.updateTask)
+router.patch('/hidden/:id', authMiddleware, checkRole(['teacher', 'admin']), taskController.updateHiddenTask)
 router.patch('/:id', authMiddleware, checkRole(['teacher', 'admin']), taskController.updateTaskFilesCount)
 router.delete('/:id', authMiddleware, checkRole(['teacher', 'admin']), taskController.deleteTask)
 

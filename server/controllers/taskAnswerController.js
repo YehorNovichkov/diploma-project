@@ -42,6 +42,24 @@ class TaskAnswerController {
         res.json(answers)
     }
 
+    async getTaskAnswersByStudent(req, res) {
+        const { studentId } = req.params
+        const answers = await db.taskAnswer.findMany({
+            where: { studentId },
+            include: {
+                task: {
+                    select: {
+                        id: true,
+                        name: true,
+                        subject: true,
+                    },
+                },
+                student: true,
+            },
+        })
+        res.json(answers)
+    }
+
     async getTaskAnswerByTaskAndStudent(req, res) {
         const { taskId, studentId } = req.query
         const answer = await db.taskAnswer.findFirst({
@@ -107,6 +125,20 @@ class TaskAnswerController {
             },
         })
         res.json(answer)
+    }
+
+    async getAvarageMarkByStudentId(req, res) {
+        const { studentId } = req.params
+        const aggregations = await db.taskAnswer.aggregate({
+            _avg: {
+                mark: true,
+            },
+            where: {
+                studentId,
+            },
+        })
+
+        res.json({ avgMark: aggregations._avg.mark })
     }
 
     async deleteTaskAnswer(req, res) {

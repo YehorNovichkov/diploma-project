@@ -1,8 +1,9 @@
 'use client'
 
 import { createTestAnswer, deleteTestAnswer, fetchTestAnswersByTestQuestionId } from '@/api/testAnswerAPI'
-import { fetchTest } from '@/api/testAPI'
+import { fetchTest, updateHiddenTest } from '@/api/testAPI'
 import { deleteTestQuestion, fetchTestQuestion, fetchTestQuestionIdsByTestId, updateTestQuestionFilesCount } from '@/api/testQuestionAPI'
+import { fetchTestResultsByTestId } from '@/api/testResultAPI'
 import { CreateTestQuestionDialog } from '@/components/teacher/createTestQuestionDialog'
 import { EditTestDialog } from '@/components/teacher/editTestDialog'
 import { EditTestQuestionDialog } from '@/components/teacher/editTestQuestionDialog'
@@ -23,6 +24,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
 import { createMarkup } from '@/lib/createMarkup'
@@ -34,19 +36,24 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns'
 import { toZonedTime } from 'date-fns-tz'
 import { IKUpload } from 'imagekitio-react'
+import { debounce } from 'lodash'
 import { CircleCheckBigIcon, Loader2Icon, PlusCircle, PlusIcon, TrashIcon } from 'lucide-react'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 export default function TestDetails({ params }) {
+    const router = useRouter()
     const ikUploadRef = useRef(null)
     const [loading, setLoading] = useState(true)
     const [test, setTest] = useState(null)
     const [questionIds, setQuestionIds] = useState([])
     const [selectedQuestion, setSelectedQuestion] = useState(null)
     const [answers, setAnswers] = useState([])
+    const [results, setResults] = useState([])
+    const [hidden, setHidden] = useState(null)
 
     const answerForm = useForm({
         resolver: zodResolver(testAnswerSchema),
@@ -60,11 +67,16 @@ export default function TestDetails({ params }) {
     useEffect(() => {
         fetchTest(params.id).then((data) => {
             setTest(data)
+            setHidden(data.hidden)
         })
 
         fetchTestQuestionIdsByTestId(params.id).then((data) => {
             setQuestionIds(data)
             setLoading(false)
+        })
+
+        fetchTestResultsByTestId(params.id).then((data) => {
+            setResults(data)
         })
     }, [params.id])
 
@@ -117,6 +129,14 @@ export default function TestDetails({ params }) {
         })
     }
 
+    const handleHiddenChange = debounce(() => {
+        updateHiddenTest(test.id, !hidden).then(() => {
+            const prevHidden = hidden
+            setHidden(!prevHidden)
+            toast.success(`Тест ${!prevHidden ? 'приховано' : 'відкрито'}`)
+        })
+    })
+
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [selectedImageIndex, setSelectedImageIndex] = useState(0)
 
@@ -149,6 +169,10 @@ export default function TestDetails({ params }) {
                                 <CardDescription>
                                     {test.class.name} • {test.subject.name} • Ліміт часу: {test.timeLimit} хв • Дедлайн:{' '}
                                     {format(toZonedTime(new Date(test.deadline), 'Europe/Kyiv'), 'dd.MM.yy HH:mm')} ({getTimeUntilDeadline(test.deadline)})
+                                    <div className='flex items-center space-x-2 mt-2'>
+                                        <Label htmlFor='hidden'>Приховане: </Label>
+                                        <Switch id='hidden' checked={hidden} onCheckedChange={handleHiddenChange} />
+                                    </div>
                                 </CardDescription>
                             </CardTitle>
                         </CardHeader>
@@ -189,7 +213,7 @@ export default function TestDetails({ params }) {
                                             )}
                                         </div>
                                     </div>
-                                    {selectedQuestion.isManual && <CardDescription>Питання передбачає ручну відповідь</CardDescription>}
+                                    {selectedQuestion && selectedQuestion.isManual && <CardDescription>Питання передбачає ручну відповідь</CardDescription>}
                                 </CardHeader>
                                 <CardContent>
                                     {selectedQuestion ? (
@@ -347,6 +371,42 @@ export default function TestDetails({ params }) {
                             </CardContent>
                         </Card>
                     </div>
+
+                    <Separator className='my-4' />
+
+                    <h1 className='text-2xl font-semibold my-4'>Результати учнів:</h1>
+                    {results.length > 0 ? (
+                        results.map((result) => (
+                            <Card
+                                key={result.id}
+                                className='w-full mb-2 cursor-pointer hover:bg-muted hover:shadow-lg transition-all duration-200 ease-in-out'
+                                onClick={() => {
+                                    router.push(`/workspace/teacher/test-result/${result.id}`)
+                                }}>
+                                <CardHeader className='pb-2'>
+                                    <CardTitle>
+                                        <div className='flex justify-between items-center align-middle'>
+                                            <CardTitle>
+                                                {result.student.name} {result.student.surname} {result.student.patronymic}
+                                            </CardTitle>
+                                            <div className='flex'>
+                                                <span className='text-sm text-muted-foreground'>
+                                                    {format(toZonedTime(new Date(result.completedAt), 'Europe/Kyiv'), 'dd.MM.yy HH:mm')}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <CardDescription>
+                                        <span>Результат:</span> {(result.mark * 100).toFixed(2)}% ({(result.mark * 12).toFixed(0)})
+                                    </CardDescription>
+                                </CardContent>
+                            </Card>
+                        ))
+                    ) : (
+                        <p className='text-muted-foreground'>Поки що результатів немає.</p>
+                    )}
 
                     {isDialogOpen && (
                         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

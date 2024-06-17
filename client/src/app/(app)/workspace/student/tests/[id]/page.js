@@ -112,20 +112,22 @@ export default function TestDetails({ params }) {
         setSelectedQuestion(questionData)
         setAnswered(false)
 
-        if (testResult) {
-            const answersData = await fetchStudentTestAnswersByResultIdQuestionId(testResult.id, questionId)
-            setStudentAnswers(answersData)
-            if (answersData.length > 0) {
-                setAnswered(true)
-                answerForm.setValue('selectedAnswerIds', [])
-            } else {
-                const testAnswersData = await fetchTestAnswersByTestQuestionId(questionId)
-                setAnswers(testAnswersData)
-                answerForm.setValue('selectedAnswerIds', [])
-            }
+        let currentTestResult = testResult
+
+        if (!currentTestResult) {
+            currentTestResult = await createTestResult(userStore.user.id, test.id)
+            setTestResult(currentTestResult)
+        }
+
+        const answersData = await fetchStudentTestAnswersByResultIdQuestionId(currentTestResult.id, questionId)
+        setStudentAnswers(answersData)
+        if (answersData.length > 0) {
+            setAnswered(true)
+            answerForm.setValue('selectedAnswerIds', [])
         } else {
-            const newTestResult = await createTestResult(userStore.user.id, test.id)
-            setTestResult(newTestResult)
+            const testAnswersData = await fetchTestAnswersByTestQuestionId(questionId)
+            setAnswers(testAnswersData)
+            answerForm.setValue('selectedAnswerIds', [])
         }
     }
 

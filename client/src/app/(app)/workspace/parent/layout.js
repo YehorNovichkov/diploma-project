@@ -4,12 +4,29 @@ import { useAppContext } from '@/components/context/appWrapper'
 import { Button } from '@/components/ui/button'
 import { ModeToggle } from '@/components/ui/mode-toggle'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { BookCheck, ListTodo, SquareUser, Triangle } from 'lucide-react'
+import { BarChart2, BookCheck, ListTodo, Loader2Icon, SquareUser, Triangle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
-export default function StudentLayout({ children }) {
+export default function TeacherLayout({ children }) {
     const router = useRouter()
-    const { userStore } = useAppContext()
+    const { userStore, parentStore } = useAppContext()
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        if (userStore.user.children.length > 0) {
+            parentStore.setSelectedStudentId(userStore.user.children[0].id)
+            setLoading(false)
+        }
+    }, [])
+
+    if (userStore.user.children.length < 1) {
+        return (
+            <main>
+                <div className='flex items-center justify-center text-3xl'>До вашого облікового запису не прив'язано жодного учня</div>
+            </main>
+        )
+    }
 
     return (
         <div className='grid h-screen w-full pl-[56px]'>
@@ -31,7 +48,7 @@ export default function StudentLayout({ children }) {
                             <TooltipTrigger asChild>
                                 <Button
                                     onClick={() => {
-                                        router.push('/workspace/student/tasks')
+                                        router.push('/workspace/parent/task-answers')
                                     }}
                                     variant='ghost'
                                     size='icon'
@@ -48,7 +65,7 @@ export default function StudentLayout({ children }) {
                             <TooltipTrigger asChild>
                                 <Button
                                     onClick={() => {
-                                        router.push('/workspace/student/tests')
+                                        router.push('/workspace/parent/test-results')
                                     }}
                                     variant='ghost'
                                     size='icon'
@@ -59,6 +76,23 @@ export default function StudentLayout({ children }) {
                             </TooltipTrigger>
                             <TooltipContent side='right' sideOffset={5}>
                                 Тести
+                            </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    onClick={() => {
+                                        router.push('/workspace/parent/stats')
+                                    }}
+                                    variant='ghost'
+                                    size='icon'
+                                    className='rounded-lg'
+                                    aria-label='Статистика'>
+                                    <BarChart2 className='size-5' />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side='right' sideOffset={5}>
+                                Статистика
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
@@ -86,7 +120,7 @@ export default function StudentLayout({ children }) {
                     </TooltipProvider>
                 </nav>
             </aside>
-            {children}
+            {loading ? <Loader2Icon className='w-10 h-10 animate-spin' /> : children}
         </div>
     )
 }
