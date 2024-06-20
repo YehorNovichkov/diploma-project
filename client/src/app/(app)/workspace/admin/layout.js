@@ -105,6 +105,7 @@ export default function AdminLayout({ children }) {
                                 <Button
                                     onClick={() => {
                                         signOut({ redirect: false })
+                                        router.push('/')
                                     }}
                                     variant='ghost'
                                     size='icon'

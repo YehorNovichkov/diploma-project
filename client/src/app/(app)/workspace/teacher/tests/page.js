@@ -111,7 +111,7 @@ export default function Tests() {
     useEffect(() => {
         setLoading(true)
         debouncedFetchTests(limit, currentTestsPage, selectedSort, selectedSortDirection, classIdValue, subjectIdValue, includeOverdue, nameQueryValue)
-    }, [currentTestsPage, selectedSort, selectedSortDirection, classIdValue, subjectIdValue, nameQueryValue, includeOverdue, debouncedFetchTests])
+    }, [currentTestsPage, selectedSort, selectedSortDirection, classIdValue, subjectIdValue, nameQueryValue, includeOverdue, debouncedFetchTests, refreshData])
 
     useEffect(() => {
         debouncedFetchClasses(classQueryValue)
@@ -125,7 +125,7 @@ export default function Tests() {
         <main>
             <div className='flex min-h-screen flex-col p-6 lg:p-12'>
                 <div className='flex items-center justify-between mb-12'>
-                    <h1 className='scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl'>Завдання</h1>
+                    <h1 className='scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl'>Тести</h1>
                     <CreateTestDialog refreshData={refreshData} setRefreshData={setRefreshData} />
                 </div>
                 <div>

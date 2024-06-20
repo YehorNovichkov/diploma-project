@@ -122,6 +122,7 @@ export default function TeacherLayout({ children }) {
                                 <Button
                                     onClick={() => {
                                         signOut({ redirect: false })
+                                        router.push('/')
                                     }}
                                     variant='ghost'
                                     size='icon'
