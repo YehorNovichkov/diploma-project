@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { ModeToggle } from '@/components/ui/mode-toggle'
-import { serverErrors } from '@/lib/serverErrors'
 import { getCurrentUserAccessToken } from '@/lib/session'
 import { userLoginSchema } from '@/schema/userLoginSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -40,6 +39,12 @@ export default function Login() {
             password: formData.password,
         })
 
+        if (!res.ok) {
+            setError({ message: 'Невірний email або пароль' })
+            setUploading(false)
+            return
+        }
+
         const token = await getCurrentUserAccessToken()
         const data = jwtDecode(token)
         userStore.setUserId(data.id)
@@ -53,7 +58,6 @@ export default function Login() {
 
     const onError = (error) => {
         setError(error)
-        form.reset()
         console.log(error)
     }
 
@@ -96,7 +100,7 @@ export default function Login() {
                             <Button type='submit' disabled={uploading}>
                                 {uploading ? <Loader2Icon className='w-5 h-5 animate-spin' /> : 'Увійти'}
                             </Button>
-                            {error && <FormMessage type='error'>{serverErrors[error]}</FormMessage>}
+                            {error && <FormMessage type='error'>{error.message}</FormMessage>}
                         </form>
                     </Form>
                 </CardContent>

@@ -24,7 +24,7 @@ import { CalendarIcon, GraduationCapIcon, LibraryBigIcon, Loader2Icon, PlusIcon 
 import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
-export function CreateTaskDialog() {
+export function CreateTaskDialog({ refreshData, setRefreshData }) {
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
 
@@ -104,6 +104,7 @@ export function CreateTaskDialog() {
         await createTask(values.name, values.description, values.deadline, values.classId, values.subjectId)
             .then(() => {
                 form.reset()
+                setRefreshData(!refreshData)
                 setDialogOpen(false)
             })
             .catch((e) => {

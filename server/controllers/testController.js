@@ -116,7 +116,7 @@ class TestController {
 
     async deleteTest(req, res) {
         const { id } = req.params
-        const test = await db.test.delete({ where: { id } })
+        const test = await db.test.delete({ where: { id: parseInt(id) } })
         res.json(test)
     }
 }

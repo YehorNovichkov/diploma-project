@@ -36,6 +36,8 @@ export default function Tasks() {
     const [currentTasksPage, setCurrentTasksPage] = useState(1)
     const [totalTasks, setTotalTasks] = useState(0)
 
+    const [refreshData, setRefreshData] = useState(false)
+
     const [nameQueryValue, setNameQueryValue] = useState('')
     const [subjectQueryValue, setSubjectQueryValue] = useState('')
     const [subjectIdValue, setSubjectIdValue] = useState('')
@@ -109,7 +111,7 @@ export default function Tasks() {
     useEffect(() => {
         setLoading(true)
         debouncedFetchTasks(limit, currentTasksPage, selectedSort, selectedSortDirection, classIdValue, subjectIdValue, includeOverdue, nameQueryValue)
-    }, [currentTasksPage, selectedSort, selectedSortDirection, classIdValue, subjectIdValue, nameQueryValue, includeOverdue, debouncedFetchTasks])
+    }, [currentTasksPage, selectedSort, selectedSortDirection, classIdValue, subjectIdValue, nameQueryValue, includeOverdue, debouncedFetchTasks, refreshData])
 
     useEffect(() => {
         debouncedFetchClasses(classQueryValue)
@@ -124,7 +126,7 @@ export default function Tasks() {
             <div className='flex min-h-screen flex-col p-6 lg:p-12'>
                 <div className='flex items-center justify-between mb-12'>
                     <h1 className='scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl'>Завдання</h1>
-                    <CreateTaskDialog />
+                    <CreateTaskDialog refreshData={refreshData} setRefreshData={setRefreshData} />
                 </div>
                 <div>
                     <div className='flex flex-wrap justify-end gap-2 border rounded-md p-1 items-center'>

@@ -1,7 +1,7 @@
 'use client'
 
 import { createTestAnswer, deleteTestAnswer, fetchTestAnswersByTestQuestionId } from '@/api/testAnswerAPI'
-import { fetchTest, updateHiddenTest } from '@/api/testAPI'
+import { deleteTest, fetchTest, updateHiddenTest } from '@/api/testAPI'
 import { deleteTestQuestion, fetchTestQuestion, fetchTestQuestionIdsByTestId, updateTestQuestionFilesCount } from '@/api/testQuestionAPI'
 import { fetchTestResultsByTestId } from '@/api/testResultAPI'
 import { CreateTestQuestionDialog } from '@/components/teacher/createTestQuestionDialog'
@@ -43,6 +43,8 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+
+import { Trash2Icon } from 'lucide-react'
 
 export default function TestDetails({ params }) {
     const router = useRouter()
@@ -137,6 +139,12 @@ export default function TestDetails({ params }) {
         })
     })
 
+    const handleTestDelete = async (id) => {
+        deleteTest(id).then(() => {
+            router.push('/workspace/teacher/tests')
+        })
+    }
+
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [selectedImageIndex, setSelectedImageIndex] = useState(0)
 
@@ -160,6 +168,25 @@ export default function TestDetails({ params }) {
                                     <CardTitle>{test.name}</CardTitle>
                                     <div className='flex'>
                                         <EditTestDialog test={test} setTest={setTest} classItem={test.class} subjectItem={test.subject} />
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <Button className='ml-1 h-6'>
+                                                    <Trash2Icon className='h-4' />
+                                                </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle>Ви впевнені що хочете видалити цей тест?</AlertDialogTitle>
+                                                    <AlertDialogDescription>
+                                                        Ця дія незворотня! Видалення тесту призведе до видалення всіх даних, пов'язаних з ним.
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel>Скасувати</AlertDialogCancel>
+                                                    <AlertDialogAction onClick={() => handleTestDelete(params.id)}>Видалити</AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
                                         <span className='text-sm text-muted-foreground ml-2'>
                                             {format(toZonedTime(new Date(test.createdAt), 'Europe/Kyiv'), 'dd.MM.yy HH:mm')}
                                         </span>

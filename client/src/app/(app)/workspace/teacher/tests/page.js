@@ -36,6 +36,8 @@ export default function Tests() {
     const [currentTestsPage, setCurrentTestsPage] = useState(1)
     const [totalTests, setTotalTests] = useState(0)
 
+    const [refreshData, setRefreshData] = useState(false)
+
     const [nameQueryValue, setNameQueryValue] = useState('')
     const [subjectQueryValue, setSubjectQueryValue] = useState('')
     const [subjectIdValue, setSubjectIdValue] = useState('')
@@ -52,7 +54,6 @@ export default function Tests() {
     const debouncedFetchTests = useCallback(
         debounce((limit, page, sort, sortDirection, classId, subjectId, includeOverdue, name) => {
             fetchTests(limit, page, sort, sortDirection, classId, subjectId, includeOverdue, name).then((data) => {
-                console.log(data)
                 setTests(data.tests)
                 setTotalTests(data.total)
                 setLoading(false)
@@ -125,7 +126,7 @@ export default function Tests() {
             <div className='flex min-h-screen flex-col p-6 lg:p-12'>
                 <div className='flex items-center justify-between mb-12'>
                     <h1 className='scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl'>Завдання</h1>
-                    <CreateTestDialog />
+                    <CreateTestDialog refreshData={refreshData} setRefreshData={setRefreshData} />
                 </div>
                 <div>
                     <div className='flex flex-wrap justify-end gap-2 border rounded-md p-1 items-center'>

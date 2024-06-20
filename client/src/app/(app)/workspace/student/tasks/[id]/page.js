@@ -160,7 +160,7 @@ export default function TaskDetails({ params }) {
 
                     <Separator className='mb-4' />
 
-                    {taskAnswer.mark && (
+                    {taskAnswer && taskAnswer.mark && (
                         <Card className='w-full mb-4'>
                             <CardHeader>
                                 <CardTitle>Оцінка: {taskAnswer.mark}/12</CardTitle>

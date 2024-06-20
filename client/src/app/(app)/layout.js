@@ -34,92 +34,80 @@ export default function AppLayout({ children }) {
     }
 
     useEffect(() => {
-        if (userStore.isAuth === true) {
+        const handleRedirection = () => {
             if (!checkAccess(userStore.user.roles, pathname) && pathname.includes('/workspace/')) {
                 router.push('/not-authorized')
                 return
-            } else {
-                if (pathname == '/workspace') {
-                    if (userStore.user.roles.length == 1) {
-                        router.push(accessRules[userStore.user.roles[0]])
-                    }
+            } else if (pathname === '/workspace') {
+                if (userStore.user.roles.length === 1) {
+                    router.push(accessRules[userStore.user.roles[0]])
+                } else {
+                    setDataLoaded(true)
                     return
                 }
-                if (pathname.includes('/login') || pathname.includes('/register')) {
-                    if (userStore.user.roles.length == 1) {
-                        router.push(accessRules[userStore.user.roles[0]])
-                    } else router.push('/workspace')
-                    return
+            } else if (pathname.includes('/login') || pathname.includes('/register')) {
+                if (userStore.user.roles.length === 1) {
+                    router.push(accessRules[userStore.user.roles[0]])
+                } else {
+                    router.push('/workspace')
                 }
+                setDataLoaded(true)
+                return
             }
             setDataLoaded(true)
-            return
         }
 
-        const setUser = async (data) => {
-            userStore.setUserId(data.id)
-            await fetchUser(userStore.userId).then((res) => {
-                userStore.setUser(res)
-                userStore.setIsAuth(true)
-            })
-        }
+        if (userStore.isAuth === true) {
+            handleRedirection()
+        } else {
+            const setUser = async (data) => {
+                userStore.setUserId(data.id)
+                await fetchUser(data.id).then((res) => {
+                    userStore.setUser(res)
+                    userStore.setIsAuth(true)
+                })
+            }
 
-        getCurrentUserAccessToken().then((token) => {
-            if (token) {
-                const decodedToken = jwtDecode(token)
-                const currentTime = Date.now().valueOf() / 1000
+            getCurrentUserAccessToken().then((token) => {
+                if (token) {
+                    const decodedToken = jwtDecode(token)
+                    const currentTime = Date.now().valueOf() / 1000
 
-                if (decodedToken.exp > currentTime) {
-                    setUser(decodedToken).then(() => {
-                        if (!checkAccess(userStore.user.roles, pathname) && pathname.includes('/workspace/')) {
-                            router.push('/not-authorized')
-                            return
-                        } else {
-                            if (pathname == '/workspace') {
-                                if (userStore.user.roles.length == 1) {
-                                    router.push(accessRules[userStore.user.roles[0]])
-                                }
-                                return
-                            }
-                            if (pathname.includes('/login') || pathname.includes('/register')) {
-                                if (userStore.user.roles.length == 1) {
-                                    router.push(accessRules[userStore.user.roles[0]])
-                                } else router.push('/workspace')
-                                return
-                            }
+                    if (decodedToken.exp > currentTime) {
+                        setUser(decodedToken).then(() => {
+                            handleRedirection()
+                        })
+                    } else {
+                        signOut({ redirect: false })
+                        if (!pathname.includes('/login') && !pathname.includes('/register')) {
+                            router.push('/login')
                         }
                         setDataLoaded(true)
-                        return
-                    })
+                    }
                 } else {
-                    signOut({ redirect: false })
                     if (!pathname.includes('/login') && !pathname.includes('/register')) {
                         router.push('/login')
                     }
                     setDataLoaded(true)
                 }
-            } else {
-                if (!pathname.includes('/login') && !pathname.includes('/register')) {
-                    router.push('/login')
-                }
-                setDataLoaded(true)
-            }
-        })
+            })
+        }
     }, [router, pathname, userStore])
 
-    if (!dataLoaded) {
-        return (
-            <div className='flex min-h-screen items-center justify-center'>
-                <Loader2Icon className='w-10 h-10 animate-spin' />
-            </div>
-        )
-    }
     return (
-        <IKContext
-            publicKey={process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY}
-            urlEndpoint={process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT}
-            authenticator={authenticator}>
-            {children}
-        </IKContext>
+        <>
+            {dataLoaded ? (
+                <IKContext
+                    publicKey={process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY}
+                    urlEndpoint={process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT}
+                    authenticator={authenticator}>
+                    {children}
+                </IKContext>
+            ) : (
+                <div className='flex min-h-screen items-center justify-center'>
+                    <Loader2Icon className='w-10 h-10 animate-spin' />
+                </div>
+            )}
+        </>
     )
 }

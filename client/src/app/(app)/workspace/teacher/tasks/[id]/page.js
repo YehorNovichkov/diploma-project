@@ -1,8 +1,19 @@
 'use client'
 
 import { fetchTaskAnswersByTask } from '@/api/taskAnswerAPI'
-import { fetchTask, updateHiddenTask, updateTaskFilesCount } from '@/api/taskAPI'
+import { deleteTask, fetchTask, updateHiddenTask, updateTaskFilesCount } from '@/api/taskAPI'
 import { EditTaskDialog } from '@/components/teacher/editTaskDialog'
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
@@ -17,7 +28,7 @@ import { format } from 'date-fns'
 import { toZonedTime } from 'date-fns-tz'
 import { IKUpload } from 'imagekitio-react'
 import { debounce } from 'lodash'
-import { Loader2Icon, PlusCircle, SquareXIcon } from 'lucide-react'
+import { Loader2Icon, PlusCircle, SquareXIcon, Trash2Icon } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
@@ -65,6 +76,12 @@ export default function TaskDetails({ params }) {
         })
     }, 200)
 
+    const handleTaskDelete = async (id) => {
+        deleteTask(id).then(() => {
+            router.push('/workspace/teacher/tasks')
+        })
+    }
+
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [selectedImageIndex, setSelectedImageIndex] = useState(0)
 
@@ -87,6 +104,25 @@ export default function TaskDetails({ params }) {
                                 <CardTitle>{task.name}</CardTitle>
                                 <div className='flex'>
                                     <EditTaskDialog task={task} setTask={setTask} />
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button className='ml-1 h-6'>
+                                                <Trash2Icon className='h-4' />
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Ви впевнені що хочете видалити це завдання?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    Ця дія незворотня! Видалення завдання призведе до видалення всіх даних, пов'язаних з ним.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Скасувати</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => handleTaskDelete(params.id)}>Видалити</AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
                                     <span className='text-sm text-muted-foreground ml-2'>
                                         {format(toZonedTime(new Date(task.createdAt), 'Europe/Kyiv'), 'dd.MM.yy HH:mm')}
                                     </span>
@@ -178,9 +214,10 @@ export default function TaskDetails({ params }) {
                                             {answer.mark ? (
                                                 <>Оцінка: {answer.mark}/12</>
                                             ) : (
-                                                <>
-                                                    <SquareXIcon className='w-2 h-2' /> Не оцінено
-                                                </>
+                                                <div className='flex items-center'>
+                                                    <SquareXIcon className='w-5 h-5 mr-2' />
+                                                    <p>Не оцінено</p>
+                                                </div>
                                             )}
                                         </CardDescription>
                                     </div>

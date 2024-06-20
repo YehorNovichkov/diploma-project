@@ -66,3 +66,8 @@ export const updateHiddenTask = async (id, hidden) => {
     const { data } = await $authHost.patch(`api/task/hidden/${id}`, { hidden })
     return data
 }
+
+export const deleteTask = async (id) => {
+    const { data } = await $authHost.delete(`api/task/${id}`)
+    return data
+}

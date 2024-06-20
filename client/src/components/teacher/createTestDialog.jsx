@@ -23,7 +23,7 @@ import { CalendarIcon, GraduationCapIcon, LibraryBigIcon, Loader2Icon, PlusIcon 
 import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
-export function CreateTestDialog() {
+export function CreateTestDialog({ refreshData, setRefreshData }) {
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
 
@@ -103,6 +103,7 @@ export function CreateTestDialog() {
         await createTest(values.name, values.deadline, values.timeLimit, values.classId, values.subjectId)
             .then(() => {
                 form.reset()
+                setRefreshData(!refreshData)
                 setDialogOpen(false)
             })
             .catch((e) => {

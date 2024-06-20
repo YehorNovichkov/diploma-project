@@ -4,7 +4,8 @@ import { useAppContext } from '@/components/context/appWrapper'
 import { Button } from '@/components/ui/button'
 import { ModeToggle } from '@/components/ui/mode-toggle'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { GraduationCap, LibraryBig, SquareUser, Triangle, Users } from 'lucide-react'
+import { GraduationCap, LibraryBig, LogOut, SquareUser, Triangle, Users } from 'lucide-react'
+import { signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
 export default function AdminLayout({ children }) {
@@ -97,6 +98,23 @@ export default function AdminLayout({ children }) {
                             </TooltipTrigger>
                             <TooltipContent side='right' sideOffset={5}>
                                 {userStore.user.email}
+                            </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    onClick={() => {
+                                        signOut({ redirect: false })
+                                    }}
+                                    variant='ghost'
+                                    size='icon'
+                                    className='mt-auto rounded-lg'
+                                    aria-label='Вийти'>
+                                    <LogOut className='size-5' />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side='right' sideOffset={5}>
+                                Вийти з облікового запису
                             </TooltipContent>
                         </Tooltip>
                         <ModeToggle />

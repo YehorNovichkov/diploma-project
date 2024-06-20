@@ -135,7 +135,7 @@ class TaskController {
 
     async deleteTask(req, res) {
         const { id } = req.params
-        const task = await db.task.delete({ where: { id } })
+        const task = await db.task.delete({ where: { id: parseInt(id) } })
         res.json(task)
     }
 }
