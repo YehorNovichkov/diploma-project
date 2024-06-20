@@ -122,6 +122,8 @@ export default function TeacherLayout({ children }) {
                                 <Button
                                     onClick={() => {
                                         signOut({ redirect: false })
+                                        userStore.setUser({})
+                                        userStore.setIsAuth(false)
                                         router.push('/')
                                     }}
                                     variant='ghost'

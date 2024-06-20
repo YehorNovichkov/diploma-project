@@ -105,6 +105,8 @@ export default function AdminLayout({ children }) {
                                 <Button
                                     onClick={() => {
                                         signOut({ redirect: false })
+                                        userStore.setUser({})
+                                        userStore.setIsAuth(false)
                                         router.push('/')
                                     }}
                                     variant='ghost'
