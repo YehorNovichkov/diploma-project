@@ -7,6 +7,7 @@ import { useAppContext } from '@/components/context/appWrapper'
 import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -44,7 +45,6 @@ export default function Tasks() {
     const [subjectPopoverOpen, setSubjectPopoverOpen] = useState(false)
 
     const classIdValue = userStore.user.classId
-    console.log(classIdValue)
 
     const debouncedFetchTasks = useCallback(
         debounce((limit, page, sort, sortDirection, classId, subjectId, includeOverdue, name) => {
@@ -75,13 +75,13 @@ export default function Tasks() {
     )
 
     const handleTasksPreviousPage = () => {
-        if (!currentTasksPage <= 1) {
+        if (!(currentTasksPage <= 1)) {
             setCurrentTasksPage((prev) => prev - 1)
         }
     }
 
     const handleTasksNextPage = () => {
-        if (!currentTasksPage >= Math.ceil(totalTasks / limit)) {
+        if (!(currentTasksPage >= Math.ceil(totalTasks / limit))) {
             setCurrentTasksPage((prev) => prev + 1)
         }
     }

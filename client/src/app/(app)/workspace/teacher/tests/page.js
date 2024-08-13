@@ -8,6 +8,7 @@ import { CreateTestDialog } from '@/components/teacher/createTestDialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Pagination, PaginationContent, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -97,13 +98,13 @@ export default function Tests() {
     )
 
     const handleTestsPreviousPage = () => {
-        if (!currentTestsPage <= 1) {
+        if (!(currentTestsPage <= 1)) {
             setCurrentTestsPage((prev) => prev - 1)
         }
     }
 
     const handleTestsNextPage = () => {
-        if (!currentTestsPage >= Math.ceil(totalTests / limit)) {
+        if (!(currentTestsPage >= Math.ceil(totalTests / limit))) {
             setCurrentTestsPage((prev) => prev + 1)
         }
     }

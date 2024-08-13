@@ -125,7 +125,7 @@ export default function TestDetails({ params }) {
     const handleUploadSuccess = (response) => {
         toast.success('Зображення успішно завантажено')
         setLoading(true)
-        updateTestQuestionFilesCount(params.id, parseInt(selectedQuestion.filesCount) + 1).then((data) => {
+        updateTestQuestionFilesCount(selectedQuestion.id, parseInt(selectedQuestion.filesCount) + 1).then((data) => {
             setSelectedQuestion(data)
             setLoading(false)
         })
